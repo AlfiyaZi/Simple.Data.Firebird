@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Firebird", "Simple.Data.Firebird\Simple.Data.Firebird.csproj", "{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Firebird.Test", "Simple.Data.Firebird.Test\Simple.Data.Firebird.Test.csproj", "{6C4E4A13-606F-49B8-A6EF-A070848912D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release-Mono|Any CPU = Release-Mono|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Release-Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{A1104E1D-E861-4B5C-B1F7-FDED179AC0AD}.Release-Mono|Any CPU.Build.0 = Release|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release-Mono|Any CPU.ActiveCfg = Release|Any CPU
+		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release-Mono|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

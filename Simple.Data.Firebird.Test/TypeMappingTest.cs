@@ -11,13 +11,13 @@ namespace Simple.Data.Firebird.Test
 {
     public class TypeMappingTest
     {
-        public class TypeMapping_NaturalNumbersTest
+        public class TypeMapping_NaturalNumbersTest : IClassFixture<DbHelper>
         {
             public List<dynamic> NaturalNumbers { get; set; }
 
-            public TypeMapping_NaturalNumbersTest()
+            public TypeMapping_NaturalNumbersTest(DbHelper helper)
             {
-                var db = Database.Open();
+                var db = helper.OpenDefault();
 
                 NaturalNumbers = db.TypesNumbersNatural.All().ToList();
             }
@@ -67,13 +67,13 @@ namespace Simple.Data.Firebird.Test
             }
         }
 
-        public class TypeMapping_RealNumbersTest
+        public class TypeMapping_RealNumbersTest : IClassFixture<DbHelper>
         {
             public List<dynamic> RealNumbers { get; set; }
 
-            public TypeMapping_RealNumbersTest()
+            public TypeMapping_RealNumbersTest(DbHelper helper) 
             {
-                var db = Database.Open();
+                var db = helper.OpenDefault();
 
                 RealNumbers = db.TypesNumbersReal.All().ToList();
             }
@@ -116,14 +116,14 @@ namespace Simple.Data.Firebird.Test
                 var realNumbersWithMaxValue = RealNumbers.FirstOrDefault(el => el.Id == 2);
 
                 Assert.NotNull(realNumbersWithMaxValue);
-                Assert.Equal(realNumbersWithMaxValue.TestFloat, 3.39999995214436E38f);
-                Assert.Equal(realNumbersWithMaxValue.TestDouble, 1.7E308);
-                Assert.Equal(realNumbersWithMaxValue.TestNumericS, 327.67m);
-                Assert.Equal(realNumbersWithMaxValue.TestNumeric, 214.7483647m);
-                Assert.Equal(realNumbersWithMaxValue.TestNumericB, 92233720368.54775807m);
-                Assert.Equal(realNumbersWithMaxValue.TestDecimalS, 999.99m);
-                Assert.Equal(realNumbersWithMaxValue.TestDecimal, 214.7483647m);
-                Assert.Equal(realNumbersWithMaxValue.TestDecimalB, 92233720368.54775807m);
+                Assert.Equal(3.39999995214436E38f, realNumbersWithMaxValue.TestFloat);
+                Assert.Equal(1.7E308, realNumbersWithMaxValue.TestDouble);
+                Assert.Equal(327.67m, realNumbersWithMaxValue.TestNumericS);
+                Assert.Equal(214.7483647m, realNumbersWithMaxValue.TestNumeric);
+                Assert.Equal(92233720368.54775807m, realNumbersWithMaxValue.TestNumericB);
+                Assert.Equal(999.99m, realNumbersWithMaxValue.TestDecimalS);
+                Assert.Equal(214.7483647m, realNumbersWithMaxValue.TestDecimal);
+                Assert.Equal(92233720368.54775807m, realNumbersWithMaxValue.TestDecimalB);
             }
 
             [Fact]
@@ -159,13 +159,13 @@ namespace Simple.Data.Firebird.Test
             }
         }
 
-        public class TypeMapping_DateTimeTest
+        public class TypeMapping_DateTimeTest : IClassFixture<DbHelper>
         {
             public List<dynamic> DateTimes { get; set; }
 
-            public TypeMapping_DateTimeTest()
+            public TypeMapping_DateTimeTest(DbHelper helper)
             {
-                var db = Database.Open();
+                var db = helper.OpenDefault();
 
                 DateTimes = db.TypesDatetime.All().ToList();
             }
@@ -204,13 +204,13 @@ namespace Simple.Data.Firebird.Test
             }
         }
 
-        public class TypeMapping_TextsTest
+        public class TypeMapping_TextsTest : IClassFixture<DbHelper>
         {
             public List<dynamic> Texts { get; set; }
 
-            public TypeMapping_TextsTest()
+            public TypeMapping_TextsTest(DbHelper helper)
             {
-                var db = Database.Open();
+                var db = helper.OpenDefault();
 
                 Texts = db.TypesText.All().ToList();
             }
@@ -236,13 +236,13 @@ namespace Simple.Data.Firebird.Test
             }
         }
 
-        public class TypeMapping_BlobTest
+        public class TypeMapping_BlobTest : IClassFixture<DbHelper>
         {
             public List<dynamic> Blobs { get; set; }
 
-            public TypeMapping_BlobTest()
+            public TypeMapping_BlobTest(DbHelper helper)
             {
-                var db = Database.Open();
+                var db = helper.OpenDefault();
 
                 Blobs = db.TypesBlob.All().ToList();
             }

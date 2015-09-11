@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Simple.Data.Firebird.Test</RootNamespace>
     <AssemblyName>Simple.Data.Firebird.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>4ddb927e</NuGetPackageImportStamp>
     <TargetFrameworkProfile />

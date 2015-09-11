@@ -1,4 +1,5 @@
-﻿CREATE TABLE TYPES_NUMBERS_NATURAL (
+﻿-- Type maping tests
+CREATE TABLE TYPES_NUMBERS_NATURAL (
     ID INTEGER NOT NULL,
     TEST_INTEGER INTEGER,
     TEST_SMALLINT SMALLINT,
@@ -77,3 +78,152 @@ INSERT INTO TYPES_BLOB (ID, TEST_BLOB_BINARY, TEST_BLOB_TEXT) VALUES (0, NULL, N
 INSERT INTO TYPES_BLOB (ID, TEST_BLOB_BINARY, TEST_BLOB_TEXT) VALUES (1, NULL, '1234567890');
 INSERT INTO TYPES_BLOB (ID, TEST_BLOB_BINARY) VALUES (2, 1);
 
+
+-- Find filtering tests
+
+CREATE DOMAIN money AS
+DECIMAL(18, 4);
+
+CREATE TABLE users (
+  id integer NOT NULL,
+  name varchar(100) NOT NULL,
+  password varchar(100) NOT NULL,
+  age integer NOT NULL
+);
+
+ALTER TABLE users
+  ADD CONSTRAINT pk_users
+  PRIMARY KEY (id);
+  
+CREATE TABLE customers
+(
+  id integer NOT NULL,
+  name varchar(100) NOT NULL,
+  address varchar(200)
+);
+
+ALTER TABLE customers
+  ADD CONSTRAINT pk_customers
+  PRIMARY KEY (id);
+      
+    
+CREATE TABLE orders (
+  id integer NOT NULL,
+  order_date timestamp NOT NULL,
+  customer_id integer NOT NULL
+);
+
+ALTER TABLE orders
+  ADD CONSTRAINT pk_orders
+  PRIMARY KEY (id);
+
+ALTER TABLE orders
+  ADD CONSTRAINT fk_orders_customers_customer_id
+  FOREIGN KEY (customer_id) REFERENCES customers (id)
+  ON DELETE NO ACTION ON UPDATE NO ACTION;
+      
+    
+CREATE TABLE items (
+  id integer NOT NULL,
+  name varchar(100) NOT NULL,
+  price money NOT NULL
+);
+
+ALTER TABLE items
+  ADD CONSTRAINT pk_items
+  PRIMARY KEY (id);
+    
+CREATE TABLE order_items (
+  id integer NOT NULL,
+  order_id integer NOT NULL,
+  item_id integer NOT NULL,
+  quantity integer  NOT NULL
+);
+
+ALTER TABLE order_items
+  ADD CONSTRAINT pk_order_items
+  PRIMARY KEY (id);
+
+ALTER TABLE order_items
+  ADD CONSTRAINT fk_order_items_item_id
+  FOREIGN KEY (item_id) REFERENCES items (id)
+  ON DELETE NO ACTION ON UPDATE NO ACTION;
+  
+ALTER TABLE order_items
+  ADD CONSTRAINT fk_order_items_order_id
+  FOREIGN KEY (order_id) REFERENCES orders (id)
+  ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+CREATE VIEW view_customers AS
+  SELECT name, address, id
+  FROM customers;
+
+
+CREATE GENERATOR GEN_CUSTOMERS_ID;
+CREATE GENERATOR GEN_USERS_ID;
+CREATE GENERATOR GEN_ORDERS_ID;
+CREATE GENERATOR GEN_ITEMS_ID;
+CREATE GENERATOR GEN_ORDER_ITEMS_ID;
+
+SET TERM ^ ;
+
+
+/* Trigger: CUSTOMERS_BI */
+CREATE OR ALTER TRIGGER CUSTOMERS_BI FOR CUSTOMERS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_customers_id,1);
+end
+^
+
+CREATE OR ALTER TRIGGER USERS_BI FOR USERS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_users_id,1);
+end
+^
+
+CREATE OR ALTER TRIGGER ORDERS_BI FOR ORDERS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_orders_id,1);
+end
+^
+
+CREATE OR ALTER TRIGGER ITEMS_BI FOR ITEMS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_items_id,1);
+end
+^
+
+CREATE OR ALTER TRIGGER ORDER_ITEMS_BI FOR ORDER_ITEMS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_order_items_id,1);
+end
+^
+
+SET TERM ; ^      
+
+INSERT INTO users (name, password, age) VALUES ('Bob', 'Bob', 32);
+INSERT INTO users (name, password, age) VALUES ('Charlie', 'Charlie', 49);
+INSERT INTO users (name, password, age) VALUES ('Dave', 'Dave', 12);
+
+INSERT INTO customers (name, address) VALUES ('Test', '100 Road');
+
+INSERT INTO orders (order_date, customer_id) VALUES ('2010-10-10 00:00:00.000', (select max(id) from customers));
+
+INSERT INTO items (name, price) VALUES ('Widget', '4.5000');
+
+INSERT INTO order_items (order_id, item_id, quantity) VALUES ((select max(id) from orders), (select max(id) from items), 10);

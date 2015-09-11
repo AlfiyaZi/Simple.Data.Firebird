@@ -121,6 +121,9 @@
   <data name="ColumnsQuery" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\schemaqueries\columnsquery.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="PrimaryKeyQuery" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\schemaqueries\primarykeyquery.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="TablesQuery" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\schemaqueries\tablesquery.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>

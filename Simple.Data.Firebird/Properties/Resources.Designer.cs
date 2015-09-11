@@ -76,6 +76,18 @@ namespace Simple.Data.Firebird.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to select ris.rdb$field_name field_name
+        ///from rdb$relation_constraints rc
+        ///join rdb$index_segments ris on rc.rdb$index_name = ris.rdb$index_name
+        ///where rc.rdb$relation_name = &apos;USERS&apos; and rc.rdb$constraint_type = &apos;PRIMARY KEY&apos;.
+        /// </summary>
+        internal static string PrimaryKeyQuery {
+            get {
+                return ResourceManager.GetString("PrimaryKeyQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to select trim(rdb$relation_name) table_name, iif(rdb$view_blr is not null,&apos;VIEW&apos;,&apos;TABLE&apos;) is_view
         ///from rdb$relations
         ///where (rdb$system_flag is null or rdb$system_flag = 0).

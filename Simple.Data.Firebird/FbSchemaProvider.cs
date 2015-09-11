@@ -60,7 +60,9 @@ namespace Simple.Data.Firebird
 
         public Key GetPrimaryKey(Table table)
         {
-            throw new NotImplementedException();
+            return new Key(SelectToDataTable(String.Format(Resources.PrimaryKeyQuery, table.ActualName))
+                .AsEnumerable()
+                .Select(columnRow => columnRow["field_name"].ToString()));
         }
 
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
@@ -76,7 +78,8 @@ namespace Simple.Data.Firebird
 
         public string NameParameter(string baseName)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(baseName)) throw new ArgumentNullException("baseName");
+            return baseName.StartsWith("@") ? baseName : String.Concat("@", baseName);
         }
 
         public string GetDefaultSchema()

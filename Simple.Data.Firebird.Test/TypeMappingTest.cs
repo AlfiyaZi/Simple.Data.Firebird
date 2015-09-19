@@ -23,7 +23,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void NaturalNumbers_RowWithOnlyZeros_ValuesAreZeros()
+            public void GetNaturalNumbers_RowWithOnlyZeros_ValuesAreZeros()
             {
                 var naturalNumbersWithZeros = NaturalNumbers.FirstOrDefault(el => el.Id == 0);
 
@@ -34,7 +34,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void NaturalNumbers_RowWithOnlyNulls_ValuesAreNulls()
+            public void GetNaturalNumbers_RowWithOnlyNulls_ValuesAreNulls()
             {
                 var naturalNumbersWithNulls = NaturalNumbers.FirstOrDefault(el => el.Id == 1);
 
@@ -45,7 +45,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void NaturalNumbers_RowWithMaxValues_ValuesAreEqualToMax()
+            public void GetNaturalNumbers_RowWithMaxValues_ValuesAreEqualToMax()
             {
                 var naturalNumbersWithMaxValue = NaturalNumbers.FirstOrDefault(el => el.Id == 2);
 
@@ -56,7 +56,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void NaturalNumbers_RowWithNumbers_MapToCorrectClrTypes()
+            public void GetNaturalNumbers_RowWithNumbers_MapToCorrectClrTypes()
             {
                 var naturalNumbersWithZeros = NaturalNumbers.FirstOrDefault(el => el.Id == 0);
 
@@ -79,7 +79,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void RealNumbers_RowWithOnlyZeros_ValuesAreZeros()
+            public void GetRealNumbers_RowWithOnlyZeros_ValuesAreZeros()
             {
                 var realNumbersWithZeros = RealNumbers.FirstOrDefault(el => el.Id == 0);
 
@@ -95,7 +95,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void RealNumbers_RowWithOnlyNulls_ValuesAreNulls()
+            public void GetRealNumbers_RowWithOnlyNulls_ValuesAreNulls()
             {
                 var realNumbersWithNulls = RealNumbers.FirstOrDefault(el => el.Id == 1);
 
@@ -111,7 +111,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void RealNumbers_RowWithMaxValues_ValuesAreEqualToMax()
+            public void GetRealNumbers_RowWithMaxValues_ValuesAreEqualToMax()
             {
                 var realNumbersWithMaxValue = RealNumbers.FirstOrDefault(el => el.Id == 2);
 
@@ -127,7 +127,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void RealNumbers_RowWith_0_1_Values_RoundingErrorsShouldNotHappen()
+            public void GetRealNumbers_RowWith_0_1_Values_RoundingErrorsShouldNotHappen()
             {
                 var realNumbersWith_0_1_Values = RealNumbers.FirstOrDefault(el => el.Id == 3);
 
@@ -143,7 +143,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void RealNumbers_RowWithNumbers_MapToCorrectClrTypes()
+            public void GetRealNumbers_RowWithNumbers_MapToCorrectClrTypes()
             {
                 var realNumbersWithZeros = RealNumbers.FirstOrDefault(el => el.Id == 0);
 
@@ -171,7 +171,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void DateTime_RowWitMinValues_ValuesAreEqualToMin()
+            public void GetDateTime_RowWitMinValues_ValuesAreEqualToMin()
             {
                 var dateTimesWithMinValue = DateTimes.FirstOrDefault(el => el.Id == 0);
 
@@ -182,7 +182,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void DateTime_RowWitMaxValues_ValuesAreEqualToMax()
+            public void GetDateTime_RowWitMaxValues_ValuesAreEqualToMax()
             {
                 var dateTimesWithMaxValue = DateTimes.FirstOrDefault(el => el.Id == 1);
 
@@ -193,7 +193,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void DateTime_RowWithNullValues_ValuesAreNull()
+            public void GetDateTime_RowWithNullValues_ValuesAreNull()
             {
                 var dateTimesWithMaxValue = DateTimes.FirstOrDefault(el => el.Id == 2);
 
@@ -216,7 +216,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void Texts_NotEmptyRow_ValuesAreEqualToExpected()
+            public void GetTexts_NotEmptyRow_ValuesAreEqualToExpected()
             {
                 var nonEmptyTexts = Texts.FirstOrDefault(el => el.Id == 0);
 
@@ -226,7 +226,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void Texts_EmptyRow_ValuesNull()
+            public void GetTexts_EmptyRow_ValuesNull()
             {
                 var emptyTexts = Texts.FirstOrDefault(el => el.Id == 1);
 
@@ -248,7 +248,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void Blobs_EmptyRow_IsNull()
+            public void GetBlobs_EmptyRow_IsNull()
             {
                 var emptyBlobs = Blobs.FirstOrDefault(el => el.Id == 0);
 
@@ -258,7 +258,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void Blobs_FilledText_IsExpectedString()
+            public void GetBlobs_FilledText_IsExpectedString()
             {
                 var emptyBlobs = Blobs.FirstOrDefault(el => el.Id == 1);
 
@@ -268,7 +268,7 @@ namespace Simple.Data.Firebird.Test
             }
 
             [Fact]
-            public void Blobs_FilledBinary_IsExpectedValue()
+            public void GetBlobs_FilledBinary_IsExpectedValue()
             {
                 var emptyBlobs = Blobs.FirstOrDefault(el => el.Id == 2);
 

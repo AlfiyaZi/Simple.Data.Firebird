@@ -28,9 +28,9 @@ namespace Simple.Data.Firebird
             if (typeId == "12") return GetTypeEntry("date");
             if (typeId == "13") return GetTypeEntry("time");
             if (typeId == "14") return GetTypeEntry("char");
-            if (typeId == "16" && (subTypeId == "0" || subTypeId == null)) return GetTypeEntry("bigint");   //on some system tables bigint fields don't have subTypeId
             if (typeId == "16" && subTypeId == "1") return GetTypeEntry("numeric");
             if (typeId == "16" && subTypeId == "2") return GetTypeEntry("decimal");
+            if (typeId == "16") return GetTypeEntry("bigint");   //on some system tables bigint fields don't have subTypeId
             if (typeId == "27") return GetTypeEntry("double precision");
             if (typeId == "35") return GetTypeEntry("timestamp");
             if (typeId == "37") return GetTypeEntry("varchar");
@@ -63,14 +63,6 @@ namespace Simple.Data.Firebird
                 {"blob sub_type binary", new TypeEntry("blob sub_type binary", DbType.Binary, FbDbType.Binary, typeof (byte[]))},
                 {"blob sub_type text", new TypeEntry("blob sub_type text",DbType.Binary, FbDbType.Binary, typeof (String))},
                 {"blob sub_type blr", new TypeEntry("blob sub_type blr", DbType.Binary, FbDbType.Binary, typeof (byte[]))},
-            };
-
-
-        private static readonly Dictionary<string, string> FbTypeIdToTypeName
-            = new Dictionary<string, string>
-            {
-                {"7", "smallint"},
-                {"8", ""}
             };
  
     }

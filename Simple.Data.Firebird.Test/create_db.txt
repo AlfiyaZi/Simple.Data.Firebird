@@ -94,6 +94,18 @@ CREATE TABLE users (
 ALTER TABLE users
   ADD CONSTRAINT pk_users
   PRIMARY KEY (id);
+
+CREATE TABLE persons (
+  id integer NOT NULL,
+  name varchar(100) NOT NULL,
+  surname varchar(100) NOT NULL,
+  middle_name varchar(100),
+  age integer NOT NULL
+);
+
+ALTER TABLE persons
+  ADD CONSTRAINT pk_persons
+  PRIMARY KEY (id);
   
 CREATE TABLE customers
 (
@@ -160,6 +172,7 @@ CREATE VIEW view_customers AS
 
 
 CREATE GENERATOR GEN_CUSTOMERS_ID;
+CREATE GENERATOR GEN_PERSONS_ID;
 CREATE GENERATOR GEN_USERS_ID;
 CREATE GENERATOR GEN_ORDERS_ID;
 CREATE GENERATOR GEN_ITEMS_ID;
@@ -184,6 +197,15 @@ as
 begin
   if (new.id is null) then
     new.id = gen_id(gen_users_id,1);
+end
+^
+
+CREATE OR ALTER TRIGGER PERSONS_BI FOR PERSONS
+ACTIVE BEFORE INSERT POSITION 0
+as
+begin
+  if (new.id is null) then
+    new.id = gen_id(gen_persons_id,1);
 end
 ^
 

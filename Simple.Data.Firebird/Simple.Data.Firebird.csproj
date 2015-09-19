@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FbConnectionProvider.cs" />
-    <Compile Include="FbCustomInserter.cs" />
+    <Compile Include="FbInserter.cs" />
     <Compile Include="FbProcedureExecutor.cs" />
     <Compile Include="FbQueryPager.cs" />
     <Compile Include="FbSchemaProvider.cs" />

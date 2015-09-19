@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,10 +17,48 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Firebird
 {
     [Export(typeof(ICustomInserter))]
-    public class FbCustomInserter : ICustomInserter
+    [Export(typeof(IBulkInserter))]
+    public class FbInserter : ICustomInserter, IBulkInserter
     {
+        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
+            bool resultRequired)
+        {
+            IDbConnection connection = null;
+            IDbTransaction currentTransaction = null;
+            
+            if (transaction == null)
+            {
+                connection = adapter.ConnectionProvider.CreateConnection();
+                connection.Open();
+                currentTransaction = connection.BeginTransaction();
+            }
+            else
+            {
+                connection = transaction.Connection;
+                currentTransaction = transaction;
+            }
+
+            //TODO: With bulk insert when results are not needed it is much faster to wrap all inserts in execute block and run them as one command
+            IList<IDictionary<string, object>> results = dataList.Select(data => Insert(adapter, tableName, data, currentTransaction, onError, resultRequired)).ToList();
+
+            if (transaction == null)
+            {
+                currentTransaction.Commit();
+                connection.Dispose();
+            }
+
+            if (resultRequired) return results;
+            else return null;
+        }
+
         public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null,
             bool resultRequired = false)
+        {
+            return Insert(adapter, tableName, data, transaction, null, resultRequired);
+        }
+
+        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null,
+            Func<IDictionary<string, object>, Exception, bool> onError = null, bool resultRequired = false)
         {
             var table = adapter.GetSchema().FindTable(tableName);
 
@@ -30,17 +70,25 @@ namespace Simple.Data.Firebird
                 Column = table.FindColumn(kv.Key)
             }).ToArray();
 
-            if (transaction == null)
+            try
             {
-                using (var connection = adapter.ConnectionProvider.CreateConnection())
+                if (transaction == null)
                 {
-                    connection.Open();
-                    return CreateCommand(connection, table, insertData, resultRequired);
+                    using (var connection = adapter.ConnectionProvider.CreateConnection())
+                    {
+                        connection.Open();
+                        return CreateCommand(connection, table, insertData, resultRequired);
+                    }
+                }
+                else
+                {
+                    return CreateCommand(transaction.Connection, table, insertData, resultRequired, transaction);
                 }
             }
-            else
+            catch (DbException ex)
             {
-                return CreateCommand(transaction.Connection, table, insertData, resultRequired, transaction);
+                if (onError != null && onError(data, ex)) return null;
+                else throw;
             }
         }
 

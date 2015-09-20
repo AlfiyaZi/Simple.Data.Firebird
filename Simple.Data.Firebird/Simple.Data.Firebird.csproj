@@ -63,6 +63,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Content Include="SchemaQueries\ForeignKeyQuery.txt" />
     <Content Include="SchemaQueries\PrimaryKeyQuery.txt" />
     <Compile Include="TypeMap.cs" />
   </ItemGroup>

@@ -79,7 +79,19 @@ namespace Simple.Data.Firebird.Properties {
         ///   Looks up a localized string similar to select ris.rdb$field_name field_name
         ///from rdb$relation_constraints rc
         ///join rdb$index_segments ris on rc.rdb$index_name = ris.rdb$index_name
-        ///where rc.rdb$relation_name = &apos;USERS&apos; and rc.rdb$constraint_type = &apos;PRIMARY KEY&apos;.
+        ///where rc.rdb$relation_name = &apos;{0}&apos; and rc.rdb$constraint_type = &apos;FOREIGN KEY&apos;.
+        /// </summary>
+        internal static string ForeignKeyQuery {
+            get {
+                return ResourceManager.GetString("ForeignKeyQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to select ris.rdb$field_name field_name
+        ///from rdb$relation_constraints rc
+        ///join rdb$index_segments ris on rc.rdb$index_name = ris.rdb$index_name
+        ///where rc.rdb$relation_name = &apos;{0}&apos; and rc.rdb$constraint_type = &apos;PRIMARY KEY&apos;.
         /// </summary>
         internal static string PrimaryKeyQuery {
             get {

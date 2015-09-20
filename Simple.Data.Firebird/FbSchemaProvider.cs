@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
+using Simple.Data.Ado;
 using Simple.Data.Ado.Schema;
 using Simple.Data.Firebird.Properties;
 
@@ -67,7 +68,20 @@ namespace Simple.Data.Firebird
 
         public IEnumerable<ForeignKey> GetForeignKeys(Table table)
         {
-            throw new NotImplementedException();
+            var result = SelectToDataTable(String.Format(Resources.ForeignKeyQuery, table.ActualName))
+                .AsEnumerable()
+                .GroupBy(columnRow =>
+                    new
+                    {
+                        Constraint = columnRow["constraint_name"].ToString(),
+                        ReferenceTable = columnRow["reference_table"].ToString()
+                    })
+                .Select(group => new ForeignKey(new ObjectName(table.Schema, table.ActualName),
+                    group.Select(columnRow => columnRow["field_name"].ToString()).Distinct(),
+                    new ObjectName(table.Schema, group.Key.ReferenceTable),
+                    group.Select(columnRow => columnRow["reference_field"].ToString()).Distinct()));
+
+            return result;
         }
 
         public string QuoteObjectName(string unquotedName)

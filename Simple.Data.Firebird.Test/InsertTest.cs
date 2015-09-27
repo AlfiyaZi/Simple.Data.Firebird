@@ -13,9 +13,6 @@ namespace Simple.Data.Firebird.Test
             _db = helper.OpenDefault();
         }
 
-
-        #region MA - added support for inserting enums
-
         internal class PersonWithEnum
         {
             public int? Id { get; set; }
@@ -93,8 +90,6 @@ namespace Simple.Data.Firebird.Test
             Assert.Equal(42, actual.Age);
             Assert.Null(actual.MiddleName);
         }
-
-        #endregion
 
         [Fact]
         public void TestInsertWithNamedArguments()
@@ -185,6 +180,17 @@ namespace Simple.Data.Firebird.Test
             Assert.Equal("Wowbagger", actuals[1].Name);
             Assert.Equal("teatime", actuals[1].Surname);
             Assert.Equal(int.MaxValue, actuals[1].Age);
+        }
+
+        [Fact]
+        public void TestInsertBlobs()
+        {
+            _db.TypesBlob.Insert(Id: 10, TestBlobText: "123", TestBlobBinary: new byte[] {50});
+
+            var insertedValues = _db.TypesBlob.FindById(10);
+            Assert.NotNull(insertedValues);
+            Assert.Equal("123", insertedValues.TestBlobText);
+            Assert.Equal(new byte[] { 50 }, insertedValues.TestBlobBinary);
         }
     }
 }

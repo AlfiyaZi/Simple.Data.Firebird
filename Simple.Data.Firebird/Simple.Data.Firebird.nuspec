@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Rafał Sawicki</authors>
+    <owners>Rafał Sawicki</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>https://github.com/rafsawicki/Simple.Data.Firebird</projectUrl>
+    <iconUrl>http://simplefx.org/images/simpledata100x100.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>firebird database data ado .net40</tags>
+  </metadata>
+</package>

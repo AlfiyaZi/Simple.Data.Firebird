@@ -51,12 +51,25 @@ namespace Simple.Data.Firebird
 
         public IEnumerable<Procedure> GetStoredProcedures()
         {
-            throw new NotImplementedException();
+            return SelectToDataTable(Resources.ProceduresQuery)
+                .AsEnumerable()
+                .Select(proc => new Procedure(proc["procedure_name"].ToString(), proc["procedure_name"].ToString(), null));
         }
 
         public IEnumerable<Parameter> GetParameters(Procedure storedProcedure)
         {
-            throw new NotImplementedException();
+            var result = SelectToDataTable(String.Format(Resources.ParametersQuery, storedProcedure.Name))
+                .AsEnumerable()
+                .Select(param => new FbProcedureParameter(param["parameter_name"].ToString(),
+                                                TypeMap.GetTypeEntry(param["field_type"].ToString(), param["field_subtype"].ToString()).ClrType,
+                                                GetParameterDirection(param["parameter_direction"]),
+                                                (short)param["parameter_number"], (int)param["is_optional"] == 1));
+            return result;
+        }
+
+        private ParameterDirection GetParameterDirection(object direction)
+        {
+            return (short)direction == 0 ? ParameterDirection.Input : ParameterDirection.Output;
         }
 
         public Key GetPrimaryKey(Table table)

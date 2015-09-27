@@ -57,6 +57,7 @@
     <Compile Include="FbProcedureExecutor.cs" />
     <Compile Include="FbQueryPager.cs" />
     <Compile Include="FbSchemaProvider.cs" />
+    <Compile Include="FbProcedureParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -64,6 +65,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Content Include="SchemaQueries\ForeignKeyQuery.txt" />
+    <Content Include="SchemaQueries\ParametersQuery.txt" />
     <Content Include="SchemaQueries\PrimaryKeyQuery.txt" />
     <Compile Include="TypeMap.cs" />
   </ItemGroup>
@@ -73,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SchemaQueries\ColumnsQuery.txt" />
+    <Content Include="SchemaQueries\ProceduresQuery.txt" />
     <Content Include="SchemaQueries\TablesQuery.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -61,7 +61,8 @@ namespace Simple.Data.Firebird.Test.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE TYPES_NUMBERS_NATURAL (
+        ///   Looks up a localized string similar to -- Type maping tests
+        ///CREATE TABLE TYPES_NUMBERS_NATURAL (
         ///    ID INTEGER NOT NULL,
         ///    TEST_INTEGER INTEGER,
         ///    TEST_SMALLINT SMALLINT,
@@ -78,8 +79,7 @@ namespace Simple.Data.Firebird.Test.Properties {
         ///    TEST_NUMERIC_S NUMERIC(3,2),
         ///    TEST_NUMERIC NUMERIC(7,7),
         ///    TEST_NUMERIC_B NUMERIC(18,8),
-        ///    TEST_DECIMAL_S DECIMAL(3,2),
-        ///    TEST_DECIMAL [rest of string was truncated]&quot;;.
+        ///    TEST_DECIMAL_S DECIMAL(3 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string create_db {
             get {

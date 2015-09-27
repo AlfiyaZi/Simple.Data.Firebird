@@ -249,3 +249,71 @@ INSERT INTO orders (order_date, customer_id) VALUES ('2010-10-10 00:00:00.000', 
 INSERT INTO items (name, price) VALUES ('Widget', '4.5000');
 
 INSERT INTO order_items (order_id, item_id, quantity) VALUES ((select max(id) from orders), (select max(id) from items), 10);
+
+---------- Procedures -----------
+
+SET TERM ^ ;
+
+CREATE OR ALTER PROCEDURE TEST_NO_RETURN
+as
+begin
+
+end
+^
+
+CREATE OR ALTER PROCEDURE TEST_NO_RETURN_INPUT_PARAMETER (
+    id integer not null
+)
+as
+begin
+
+end
+^
+
+CREATE TABLE TEST_NO_RETURN_OPT_INPUT_VALS (
+    ID    INTEGER NOT NULL,
+    OPT   INTEGER,
+    OPT1  INTEGER,
+    OPT2  INTEGER
+)^
+
+CREATE OR ALTER PROCEDURE TEST_NO_RETURN_OPT_INPUT_PARAMS (
+    id integer,
+	opt integer = null,
+	opt1 integer = 1,
+	opt2 integer = 2
+)
+as
+begin
+	insert into TEST_NO_RETURN_OPT_INPUT_VALS(id,opt,opt1,opt2) values (:id,:opt,:opt1,:opt2);
+end
+^
+
+CREATE OR ALTER PROCEDURE TEST_RETURN_NO_INPUT_PARAMS 
+returns (
+    val integer,
+	null_val integer
+)
+as
+begin
+	val = 1;
+	suspend;
+end
+^
+
+CREATE OR ALTER PROCEDURE TEST_RETURN_IN_OUT_PARAMS (
+	number integer
+)
+returns (
+    val integer
+)
+as
+begin
+	val = 1;
+	suspend;
+	val = 2;
+	suspend;
+end
+^
+
+SET TERM ; ^

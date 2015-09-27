@@ -76,14 +76,39 @@ namespace Simple.Data.Firebird.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to select ris.rdb$field_name field_name
-        ///from rdb$relation_constraints rc
-        ///join rdb$index_segments ris on rc.rdb$index_name = ris.rdb$index_name
-        ///where rc.rdb$relation_name = &apos;{0}&apos; and rc.rdb$constraint_type = &apos;FOREIGN KEY&apos;.
+        ///   Looks up a localized string similar to SELECT
+        ///    trim(detail_index_segments.rdb$field_name) AS field_name,
+        ///    trim(master_relation_constraints.rdb$relation_name) AS reference_table,
+        ///    trim(master_index_segments.rdb$field_name) AS reference_field,
+        ///    trim(detail_relation_constraints.rdb$constraint_name) AS constraint_name
+        ///FROM
+        ///    rdb$relation_constraints detail_relation_constraints
+        ///    JOIN rdb$index_segments detail_index_segments ON detail_relation_constraints.rdb$index_name = detail_index_segments.rdb$index_name 
+        ///    JOIN rdb$ref_ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ForeignKeyQuery {
             get {
                 return ResourceManager.GetString("ForeignKeyQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to select trim(pp.rdb$parameter_name) parameter_name,
+        ///pp.rdb$parameter_type parameter_direction,
+        ///f.rdb$field_type field_type, f.rdb$field_sub_type field_subtype,
+        ///f.rdb$field_length field_length,
+        ///case
+        ///    when pp.rdb$parameter_type=0 and
+        ///    iif(pp.rdb$field_source starting with &apos;RDB$&apos;, f.rdb$default_source, pp.rdb$default_source) is not null then 1
+        ///    else 0
+        ///end is_optional,
+        ///pp.rdb$parameter_number parameter_number
+        ///from RDB$PROCEDURE_PARAMETERS pp
+        ///join rdb$fields f on f.rdb$field_name = pp.rdb$fiel [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ParametersQuery {
+            get {
+                return ResourceManager.GetString("ParametersQuery", resourceCulture);
             }
         }
         
@@ -96,6 +121,20 @@ namespace Simple.Data.Firebird.Properties {
         internal static string PrimaryKeyQuery {
             get {
                 return ResourceManager.GetString("PrimaryKeyQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to select
+        ///  trim(rp.rdb$procedure_name) AS procedure_name
+        ///from
+        ///  rdb$procedures rp
+        ///where
+        ///  rp.rdb$system_flag = 0.
+        /// </summary>
+        internal static string ProceduresQuery {
+            get {
+                return ResourceManager.GetString("ProceduresQuery", resourceCulture);
             }
         }
         

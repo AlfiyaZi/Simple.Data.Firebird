@@ -260,22 +260,22 @@ namespace Simple.Data.Firebird.Test
             [Fact]
             public void GetBlobs_FilledText_IsExpectedString()
             {
-                var emptyBlobs = Blobs.FirstOrDefault(el => el.Id == 1);
+                var blobs = Blobs.FirstOrDefault(el => el.Id == 1);
 
-                Assert.NotNull(emptyBlobs);
-                Assert.Equal(typeof(String), emptyBlobs.TestBlobText.GetType());
-                Assert.Equal("1234567890", emptyBlobs.TestBlobText);
+                Assert.NotNull(blobs);
+                Assert.Equal(typeof(String), blobs.TestBlobText.GetType());
+                Assert.Equal("1234567890", blobs.TestBlobText);
             }
 
             [Fact]
             public void GetBlobs_FilledBinary_IsExpectedValue()
             {
-                var emptyBlobs = Blobs.FirstOrDefault(el => el.Id == 2);
+                var blobs = Blobs.FirstOrDefault(el => el.Id == 2);
 
-                Assert.NotNull(emptyBlobs);
-                Assert.Equal(typeof(byte[]), emptyBlobs.TestBlobBinary.GetType());
-                Assert.True(emptyBlobs.TestBlobBinary.Length == 1);
-                Assert.Equal(49, emptyBlobs.TestBlobBinary[0]);     // value for 1
+                Assert.NotNull(blobs);
+                Assert.Equal(typeof(byte[]), blobs.TestBlobBinary.GetType());
+                Assert.True(blobs.TestBlobBinary.Length == 1);
+                Assert.Equal(49, blobs.TestBlobBinary[0]);     // value for 1
             }
         }
     }

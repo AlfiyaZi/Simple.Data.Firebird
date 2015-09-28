@@ -55,10 +55,10 @@ namespace Simple.Data.Firebird.Test
         [Fact]
         public void TestNoReturnInsertToTable()
         {
-            _db.TestNoReturnOptInputParams(1);
+            _db.TestNoReturnOptInputParams(2);
 
-            var tableResult = _db.TestNoReturnOptInputVals.FindById(1);
-            Assert.Equal(1, tableResult.Id);
+            var tableResult = _db.TestNoReturnOptInputVals.FindById(2);
+
             Assert.Equal(null, tableResult.Opt);
             Assert.Equal(1, tableResult.Opt1);
             Assert.Equal(2, tableResult.Opt2);

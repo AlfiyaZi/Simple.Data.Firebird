@@ -2,7 +2,7 @@
 Simple.Data.Firebird is an adapter for Simple.Data framework. 
 
 # Use
-Easiest way to install is to use a NuGet package (). Firebird ADO.NET Data provider is also required (if missing, it will be installed along with NuGet package).
+Easiest way to install is to use a NuGet package (https://www.nuget.org/packages/Simple.Data.Firebird). Firebird ADO.NET Data provider is also required.
 
 # Testing
 Adapter was tested against Firebird 2.5. By default, tests use user 'SYSDBA' with 'masterkey' password. It can easily be changed in App.config in connectionStringTemplate key.

@@ -23,32 +23,27 @@ namespace Simple.Data.Firebird
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
             bool resultRequired)
         {
-            IDbConnection connection = null;
-            IDbTransaction currentTransaction = null;
-            
+            IEnumerable<IDictionary<string, object>> results;
+
+            //TODO: With bulk insert when results are not needed it is much faster to wrap all inserts in execute block and run them as one command            
             if (transaction == null)
             {
-                connection = adapter.ConnectionProvider.CreateConnection();
-                connection.Open();
-                currentTransaction = connection.BeginTransaction();
+                using (var connection = adapter.ConnectionProvider.CreateConnection())
+                {
+                    connection.Open();
+                    using (var currentTransaction = connection.BeginTransaction())
+                    {
+                        results = dataList.Select(data => Insert(adapter, tableName, data, currentTransaction, onError, resultRequired)).ToList();
+                        currentTransaction.Commit();
+                    }
+                }
             }
             else
             {
-                connection = transaction.Connection;
-                currentTransaction = transaction;
+                results = dataList.Select(data => Insert(adapter, tableName, data, transaction, onError, resultRequired));
             }
 
-            //TODO: With bulk insert when results are not needed it is much faster to wrap all inserts in execute block and run them as one command
-            IList<IDictionary<string, object>> results = dataList.Select(data => Insert(adapter, tableName, data, currentTransaction, onError, resultRequired)).ToList();
-
-            if (transaction == null)
-            {
-                currentTransaction.Commit();
-                connection.Dispose();
-            }
-
-            if (resultRequired) return results;
-            else return null;
+            return results;
         }
 
         public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null,

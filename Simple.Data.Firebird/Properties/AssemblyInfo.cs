@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Simple.Data.Firebird")]
-[assembly: AssemblyDescription("Firebird adapter for Simple.Data")]
+[assembly: AssemblyDescription("Firebird adapter for Simple.Data framework")]
 [assembly: AssemblyCompany("Rafał Sawicki")]
 [assembly: AssemblyProduct("Simple.Data.Firebird")]
 [assembly: AssemblyCopyright("Copyright © Rafał Sawicki 2015")]

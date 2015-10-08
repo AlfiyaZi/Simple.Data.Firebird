@@ -17,43 +17,10 @@ using Simple.Data.Extensions;
 namespace Simple.Data.Firebird
 {
     [Export(typeof(ICustomInserter))]
-    [Export(typeof(IBulkInserter))]
-    public class FbInserter : ICustomInserter, IBulkInserter
+    public class FbInserter : ICustomInserter
     {
-        public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
-            bool resultRequired)
-        {
-            IEnumerable<IDictionary<string, object>> results;
-
-            //TODO: With bulk insert when results are not needed it is much faster to wrap all inserts in execute block and run them as one command            
-            if (transaction == null)
-            {
-                using (var connection = adapter.ConnectionProvider.CreateConnection())
-                {
-                    connection.Open();
-                    using (var currentTransaction = connection.BeginTransaction())
-                    {
-                        results = dataList.Select(data => Insert(adapter, tableName, data, currentTransaction, onError, resultRequired)).ToList();
-                        currentTransaction.Commit();
-                    }
-                }
-            }
-            else
-            {
-                results = dataList.Select(data => Insert(adapter, tableName, data, transaction, onError, resultRequired));
-            }
-
-            return results;
-        }
-
         public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null,
             bool resultRequired = false)
-        {
-            return Insert(adapter, tableName, data, transaction, null, resultRequired);
-        }
-
-        public IDictionary<string, object> Insert(AdoAdapter adapter, string tableName, IDictionary<string, object> data, IDbTransaction transaction = null,
-            Func<IDictionary<string, object>, Exception, bool> onError = null, bool resultRequired = false)
         {
             var table = adapter.GetSchema().FindTable(tableName);
 
@@ -65,29 +32,22 @@ namespace Simple.Data.Firebird
                 Column = table.FindColumn(kv.Key)
             }).ToArray();
 
-            try
+            if (transaction == null)
             {
-                if (transaction == null)
+                using (var connection = adapter.ConnectionProvider.CreateConnection())
                 {
-                    using (var connection = adapter.ConnectionProvider.CreateConnection())
-                    {
-                        connection.Open();
-                        return CreateCommand(connection, table, insertData, resultRequired);
-                    }
-                }
-                else
-                {
-                    return CreateCommand(transaction.Connection, table, insertData, resultRequired, transaction);
+                    connection.Open();
+                    return CreateAndExecuteInsertCommand(connection, table, insertData, resultRequired);
                 }
             }
-            catch (DbException ex)
+            else
             {
-                if (onError != null && onError(data, ex)) return null;
-                else throw;
+                return CreateAndExecuteInsertCommand(transaction.Connection, table, insertData, resultRequired, transaction);
             }
+            
         }
 
-        private IDictionary<string, object> CreateCommand(IDbConnection connection, Table table, InsertColumn[] insertColumns, bool resultRequired, IDbTransaction transaction = null)
+        private IDictionary<string, object> CreateAndExecuteInsertCommand(IDbConnection connection, Table table, InsertColumn[] insertColumns, bool resultRequired, IDbTransaction transaction = null)
         {
             using (var command = connection.CreateCommand())
             {
@@ -131,15 +91,6 @@ namespace Simple.Data.Firebird
             
             if (resultRequired) return string.Format("INSERT INTO {0} ({1}) VALUES({2}) RETURNING {1};", table.QualifiedName, columnsSql, valuesSql);
             else return string.Format("INSERT INTO {0} ({1}) VALUES({2});", table.QualifiedName, columnsSql, valuesSql);
-        }
-
-
-        private class InsertColumn
-        {
-            public string Name { get; set; }
-            public object Value { get; set; }
-            public string ParameterName { get; set; }
-            public Column Column { get; set; }
         }
     }
 }

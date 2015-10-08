@@ -53,12 +53,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbHelpers.cs" />
+    <Compile Include="FbBulkInserter.cs" />
     <Compile Include="FbConnectionProvider.cs" />
     <Compile Include="FbInserter.cs" />
     <Compile Include="FbProcedureExecutor.cs" />
     <Compile Include="FbQueryPager.cs" />
     <Compile Include="FbSchemaProvider.cs" />
     <Compile Include="FbProcedureParameter.cs" />
+    <Compile Include="InsertColumn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -192,5 +192,46 @@ namespace Simple.Data.Firebird.Test
             Assert.Equal("123", insertedValues.TestBlobText);
             Assert.Equal(new byte[] { 50 }, insertedValues.TestBlobBinary);
         }
+
+        [Fact]
+        public void TestInsertWithNonClrObject()
+        {
+            var actual = _db.Persons.Insert(Name: "John", Surname: new Surname("Doe"), MiddleName: null, Age: 42);
+
+            Assert.Equal("John", actual.Name);
+            Assert.Equal("Doe", actual.Surname);
+            Assert.Equal(42, actual.Age);
+            Assert.Null(actual.MiddleName);
+        }
+
+        [Fact]
+        public void TestInsertManyWithNonClrObject()
+        {
+            var actual = _db.Persons.Insert(new[]
+            {
+                new {Name = "John", Surname = "", Age = 42},
+                new {Name = "Lois", Surname = "", Age = 42}
+            });
+
+            //Assert.Equal("John", actual.Name);
+            //Assert.Equal("Doe", actual.Surname);
+            //Assert.Equal(42, actual.Age);
+            //Assert.Null(actual.MiddleName);
+        }
+
+    public class Surname
+    {
+        private readonly string _surname;
+
+        public Surname(string surname)
+        {
+            _surname = surname;
+        }
+
+        public override string ToString()
+        {
+            return _surname;
+        }
     }
+}
 }

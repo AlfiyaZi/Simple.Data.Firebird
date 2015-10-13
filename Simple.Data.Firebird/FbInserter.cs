@@ -29,7 +29,7 @@ namespace Simple.Data.Firebird
                 Name = kv.Key,
                 ParameterName = "@p" + idx,
                 Value = kv.Value,
-                Column = table.FindColumn(kv.Key)
+                Column = (FbColumn) table.FindColumn(kv.Key)
             }).ToArray();
 
             if (transaction == null)

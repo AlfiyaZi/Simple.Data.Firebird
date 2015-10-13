@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
@@ -13,109 +14,123 @@ namespace Simple.Data.Firebird
     [Export(typeof(IBulkInserter))]
     public class FbBulkInserter : IBulkInserter
     {
-        private const int MaximumExecuteBlockQueries = 255;
+        private Lazy<FbInserter> _inserter = new Lazy<FbInserter>(); 
 
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
             bool resultRequired)
         {
-            //test only
-            resultRequired = false;
+            //ToDO: benchmark the difference
+            //ToDo: support onError collection
+            List<IDictionary<string, object>> result = null;
 
-            IEnumerable<IDictionary<string, object>> result = null;
-            var table = adapter.GetSchema().FindTable(tableName);
-
-            var insertGroups = dataList.Select((data, idx) => new { Data = data, Id = idx }).GroupBy(data => data.Id / MaximumExecuteBlockQueries);
-            foreach (var insertGroup in insertGroups)
+            if (transaction == null)
             {
-                int parameterIndex = 0;
-                var insertColumnsValues = insertGroup.Select(data =>
+                adapter.InTransaction(currentTransaction =>
                 {
-                    var insertData = data.Data.Where(p => table.HasColumn(p.Key)).Select(kv => new InsertColumn
-                    {
-                        Name = kv.Key,
-                        ParameterName = "@p" + parameterIndex++,
-                        Value = kv.Value,
-                        Column = table.FindColumn(kv.Key)
-                    }).ToArray();
-
-                    return new
-                    {
-                        InsertData = insertData,
-                        InsertSqlLine = GetInsertSql(table, insertData, resultRequired)
-                    };
+                    result = (List<IDictionary<string, object>>) Insert(adapter, tableName, dataList, currentTransaction, onError, resultRequired);
                 });
+                return result;
+            }
 
-                if (transaction == null)
+            if (resultRequired) result = new List<IDictionary<string, object>>();
+            
+            var table = adapter.GetSchema().FindTable(tableName);
+            var tableColumns = table.Columns.Select(c => (FbColumn)c).ToArray();
+
+            var returnsColumnsSql = tableColumns.Select(c => c.ToSql()).ToList();
+            var queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
+
+            foreach (var data in dataList)
+            {
+                var insertData = data.Where(p => table.HasColumn(p.Key)).Select(kv => new InsertColumn
                 {
-                    adapter.InTransaction(currentTransaction =>
-                    {
-                        var insertColumnsValuesList = insertColumnsValues.ToList();
-                        string executeBlockSql = String.Format(GetExecuteBlockTemplate(resultRequired),
-                            String.Join(Environment.NewLine, insertColumnsValuesList.Select(ig => ig.InsertSqlLine)));
+                    Name = kv.Key,
+                    Value = kv.Value,
+                    Column = (FbColumn) table.FindColumn(kv.Key)
+                }).ToArray();
 
-                        CreateAndExecuteInsertCommand(currentTransaction.Connection, table, executeBlockSql,
-                            insertColumnsValuesList.SelectMany(cv => cv.InsertData).ToArray(), resultRequired,
-                            currentTransaction);
-                    });
+                string insertSql = GetInsertSql(tableName, tableColumns, insertData, resultRequired);
+
+                if (CanInsertInExecuteBlock(insertData, insertSql, queryBuilder.MaximumQuerySize))
+                {
+
+                    if (queryBuilder.CanAddQuery(insertSql)) queryBuilder.AddQuery(insertSql);
+                    else
+                    {
+                        var subResult = CreateAndExecuteInsertCommand(transaction, queryBuilder.GetSql(), resultRequired);
+                        if (resultRequired) result.AddRange(subResult);
+                        queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
+                        queryBuilder.AddQuery(insertSql);
+                        //ToDo - handle blob types and strings > 65535b
+                    }
                 }
+                else
+                {
+                    var subResult = _inserter.Value.Insert(adapter, tableName, data, transaction, resultRequired);
+                    if (resultRequired) result.Add(subResult);
+                }
+            }
+
+            if (queryBuilder.QueryCount > 0)
+            {
+                var subResult = CreateAndExecuteInsertCommand(transaction, queryBuilder.GetSql(), resultRequired);
+                if (resultRequired) result.AddRange(subResult);
             }
 
             return result;
         }
 
-        private IDictionary<string, object> CreateAndExecuteInsertCommand(IDbConnection connection, Table table, string executeBlockSql, InsertColumn[] insertColumns, bool resultRequired, IDbTransaction transaction = null)
+        
+        private bool CanInsertInExecuteBlock(InsertColumn[] data, string insertSql, int maximumQuerySize)
         {
-            using (var command = connection.CreateCommand())
+            return
+                data.All(
+                    ic => ic.Value == null || (
+                        ic.Value.GetType() != typeof (byte[]) &&
+                        FbBulkInsertQueryBuilder.SizeOf(insertSql) > maximumQuerySize)
+                    );
+        }
+
+        private IEnumerable<IDictionary<string, object>> CreateAndExecuteInsertCommand(IDbTransaction transaction, string executeBlockSql, bool resultRequired)
+        {
+            using (var command = transaction.Connection.CreateCommand())
             {
                 command.Transaction = transaction;
                 command.CommandText = executeBlockSql;
-
-                //foreach (var insertColumn in insertColumns)
-                //{
-                //    command.Parameters.Add(new FbParameter
-                //    {
-                //        ParameterName = insertColumn.ParameterName,
-                //        Value = insertColumn.Value,
-                //        Direction = resultRequired ? ParameterDirection.InputOutput : ParameterDirection.Input
-                //    });
-                //}
 
                 return ExecuteInsertCommand(command, resultRequired);
             }
         }
 
-        private IDictionary<string, object> ExecuteInsertCommand(IDbCommand command, bool resultRequired)
+        private IEnumerable<IDictionary<string, object>> ExecuteInsertCommand(IDbCommand command, bool resultRequired)
         {
-            command.ExecuteNonQuery();
-
             if (resultRequired)
             {
-                return null;
-                    //columnParameters.ToDictionary(p => p.Key, p => p.Value.Value is DBNull ? null : p.Value.Value);
+                using (var rdr = command.ExecuteReader())
+                {
+                    return rdr.ToDictionaries();
+                }
             }
-
-            return null;
+            else
+            {
+                command.ExecuteNonQuery();
+                return null;
+            }
         }
 
-        private string GetExecuteBlockTemplate(Table table, bool resultRequired)
-        {
-            if (resultRequired)
-                return null;//String.Join(Environment.NewLine, String.Format("execute block returns ({0}) as begin", table.Columns.Select(c => c.QuotedName + " " + c.)), "{0}", "end");
-            return String.Join(Environment.NewLine, "execute block as begin", "{0}", "end");
-        }
-
-        private string GetInsertSql(Table table, InsertColumn[] insertData, bool resultRequired)
+        private string GetInsertSql(string tableName, FbColumn[] tableColumns, InsertColumn[] insertData, bool resultRequired)
         {
             string columnsSql = String.Join(",", insertData.Select(s => s.Column.QuotedName));
-            string valuesSql = String.Join(",", insertData.Select(c => c.Value != null ? String.Format("'{0}'", c.Value) : "null"));
+            string valuesSql = String.Join(",", insertData.Select(c => c.ValueToSql()));
 
             if (resultRequired)
             {
-                string returnsSql = String.Join(",", insertData.Select(c => ":" + c.Column.QuotedName));
-                return string.Format("INSERT INTO {0} ({1}) VALUES({2}) RETURNING {1} into {3};suspend;",
-                table.QualifiedName, columnsSql, valuesSql, returnsSql);
+                string returnsColumnSql = String.Join(",", tableColumns.Select(c => c.QuotedName));
+                string returnsVariablesSql = String.Join(",", tableColumns.Select(c => ":" + c.QuotedName));
+                return string.Format("INSERT INTO {0} ({1}) VALUES({2}) RETURNING {3} into {4};suspend;",
+                tableName, columnsSql, valuesSql, returnsColumnSql, returnsVariablesSql);
             }
-            else return string.Format("INSERT INTO {0} ({1}) VALUES({2});", table.QualifiedName, columnsSql, valuesSql);
+            else return string.Format("INSERT INTO {0} ({1}) VALUES({2});", tableName, columnsSql, valuesSql);
         }
     }
 }

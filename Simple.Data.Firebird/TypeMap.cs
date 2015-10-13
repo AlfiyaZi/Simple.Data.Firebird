@@ -46,23 +46,23 @@ namespace Simple.Data.Firebird
         private static readonly Dictionary<string, TypeEntry> FbTypeToTypeEntry =
             new Dictionary<string, TypeEntry>
             {
-                {"smallint", new TypeEntry("smallint", DbType.Int16, FbDbType.SmallInt, typeof (Int16))},
-                {"integer", new TypeEntry("integer", DbType.Int32, FbDbType.Integer, typeof (Int32))},
-                {"char", new TypeEntry("char", DbType.StringFixedLength, FbDbType.Char, typeof (String))},
-                {"varchar", new TypeEntry("varchar", DbType.String, FbDbType.VarChar, typeof (String))},
-                {"float", new TypeEntry("float", DbType.Single, FbDbType.Float, typeof (Single))},
-                {"numeric s", new TypeEntry("numeric s", DbType.Double, FbDbType.Numeric, typeof (Decimal))},
-                {"decimal s", new TypeEntry("decimal s", DbType.Double, FbDbType.Decimal, typeof (Decimal))},
-                {"double precision", new TypeEntry("double precision", DbType.Double, FbDbType.Double, typeof (Double))},
-                {"numeric", new TypeEntry("numeric", DbType.Decimal, FbDbType.Numeric, typeof (Decimal))},
-                {"decimal", new TypeEntry("decimal", DbType.Decimal, FbDbType.Decimal, typeof (Decimal))},
-                {"timestamp", new TypeEntry("timestamp", DbType.DateTime, FbDbType.TimeStamp, typeof (DateTime))},
-                {"date", new TypeEntry("date", DbType.Date, FbDbType.Date, typeof (DateTime))},
-                {"time", new TypeEntry("time", DbType.Time, FbDbType.Time, typeof (TimeSpan))},
-                {"bigint", new TypeEntry("bigint", DbType.Int64, FbDbType.BigInt, typeof (Int64))},
-                {"blob sub_type binary", new TypeEntry("blob sub_type binary", DbType.Binary, FbDbType.Binary, typeof (byte[]))},
-                {"blob sub_type text", new TypeEntry("blob sub_type text",DbType.Binary, FbDbType.Binary, typeof (String))},
-                {"blob sub_type blr", new TypeEntry("blob sub_type blr", DbType.Binary, FbDbType.Binary, typeof (byte[]))},
+                {"smallint", new TypeEntry("smallint", DbType.Int16, FbDbType.SmallInt, typeof (Int16), true, true)},
+                {"integer", new TypeEntry("integer", DbType.Int32, FbDbType.Integer, typeof (Int32), false, false)},
+                {"char", new TypeEntry("char", DbType.StringFixedLength, FbDbType.Char, typeof (String), true, false)},
+                {"varchar", new TypeEntry("varchar", DbType.String, FbDbType.VarChar, typeof (String), true, false)},
+                {"float", new TypeEntry("float", DbType.Single, FbDbType.Float, typeof (Single), false, false)},
+                {"numeric s", new TypeEntry("numeric", DbType.Double, FbDbType.Numeric, typeof (Decimal), true, true)},
+                {"decimal s", new TypeEntry("decimal", DbType.Double, FbDbType.Decimal, typeof (Decimal), true, true)},
+                {"double precision", new TypeEntry("double precision", DbType.Double, FbDbType.Double, typeof (Double), false, false)},
+                {"numeric", new TypeEntry("numeric", DbType.Decimal, FbDbType.Numeric, typeof (Decimal), true, true)},
+                {"decimal", new TypeEntry("decimal", DbType.Decimal, FbDbType.Decimal, typeof (Decimal), true, true)},
+                {"timestamp", new TypeEntry("timestamp", DbType.DateTime, FbDbType.TimeStamp, typeof (DateTime), false, false)},
+                {"date", new TypeEntry("date", DbType.Date, FbDbType.Date, typeof (DateTime), false, false)},
+                {"time", new TypeEntry("time", DbType.Time, FbDbType.Time, typeof (TimeSpan), false, false)},
+                {"bigint", new TypeEntry("bigint", DbType.Int64, FbDbType.BigInt, typeof (Int64), false, false)},
+                {"blob sub_type binary", new TypeEntry("blob sub_type binary", DbType.Binary, FbDbType.Binary, typeof (byte[]), false, false)},
+                {"blob sub_type text", new TypeEntry("blob sub_type text",DbType.Binary, FbDbType.Binary, typeof (String), false, false)},
+                {"blob sub_type blr", new TypeEntry("blob sub_type blr", DbType.Binary, FbDbType.Binary, typeof (byte[]), false, false)},
             };
  
     }
@@ -73,13 +73,17 @@ namespace Simple.Data.Firebird
         public DbType DbType { get; private set; }
         public FbDbType FbDbType { get; private set; }
         public Type ClrType { get; private set; }
+        public bool WithLength { get; set; }
+        public bool WithPrecision { get; set; }
 
-        public TypeEntry(string fbTypeName, DbType dbType, FbDbType fbDbType, Type clrType)
+        public TypeEntry(string fbTypeName, DbType dbType, FbDbType fbDbType, Type clrType, bool withLength, bool withPrecision)
         {
             FbTypeName = fbTypeName;
             DbType = dbType;
             FbDbType = fbDbType;
             ClrType = clrType;
+            WithLength = withLength;
+            WithPrecision = withPrecision;
         }
     }
 }

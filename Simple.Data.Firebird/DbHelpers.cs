@@ -17,7 +17,15 @@ namespace Simple.Data.Firebird
                 using (var currentTransaction = connection.BeginTransaction())
                 {
                     action(currentTransaction);
-                    currentTransaction.Commit();
+                    try
+                    {
+                        currentTransaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        currentTransaction.Rollback();
+                        throw;
+                    }
                 }
             }
         }

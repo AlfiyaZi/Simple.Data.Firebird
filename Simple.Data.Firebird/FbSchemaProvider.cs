@@ -40,12 +40,13 @@ namespace Simple.Data.Firebird
 
             return SelectToDataTable(String.Format(Resources.ColumnsQuery, table.ActualName))
             .AsEnumerable()
-            .Select(columnRow => new Column(columnRow["field_name"].ToString(),
+            .Select(columnRow => new FbColumn(columnRow["field_name"].ToString(),
                 table,
                 false,
-                TypeMap.GetTypeEntry(columnRow["field_type"].ToString(),
-                    columnRow["field_subtype"].ToString()).DbType,
-                Int32.Parse(columnRow["field_length"].ToString()))
+                Int32.Parse(columnRow["field_length"].ToString()),
+                Int32.Parse(columnRow["field_precision"].ToString()),
+                TypeMap.GetTypeEntry(columnRow["field_type"].ToString(), columnRow["field_subtype"].ToString())
+                )
             );
         }
 

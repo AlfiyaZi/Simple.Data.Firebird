@@ -55,6 +55,8 @@
   <ItemGroup>
     <Compile Include="DbHelpers.cs" />
     <Compile Include="FbBulkInserter.cs" />
+    <Compile Include="FbBulkInsertQueryBuilder.cs" />
+    <Compile Include="FbColumn.cs" />
     <Compile Include="FbConnectionProvider.cs" />
     <Compile Include="FbInserter.cs" />
     <Compile Include="FbProcedureExecutor.cs" />

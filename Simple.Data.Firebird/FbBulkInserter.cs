@@ -19,7 +19,6 @@ namespace Simple.Data.Firebird
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
             bool resultRequired)
         {
-            //ToDO: benchmark the difference
             //ToDo: support onError collection
             List<IDictionary<string, object>> result = null;
 
@@ -41,7 +40,7 @@ namespace Simple.Data.Firebird
             var queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
 
             foreach (var data in dataList)
-            {
+            { //add list, add data, clean on execute procedure (or even better, pass to create and execute insert command) and call onError for all if exception occurs
                 var insertData = data.Where(p => table.HasColumn(p.Key)).Select(kv => new InsertColumn
                 {
                     Name = kv.Key,
@@ -51,7 +50,7 @@ namespace Simple.Data.Firebird
 
                 string insertSql = GetInsertSql(tableName, tableColumns, insertData, resultRequired);
 
-                if (CanInsertInExecuteBlock(insertData, insertSql, queryBuilder.MaximumQuerySize))
+                if (CanInsertInExecuteBlock(insertData, insertSql, queryBuilder))
                 {
 
                     if (queryBuilder.CanAddQuery(insertSql)) queryBuilder.AddQuery(insertSql);
@@ -61,7 +60,6 @@ namespace Simple.Data.Firebird
                         if (resultRequired) result.AddRange(subResult);
                         queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
                         queryBuilder.AddQuery(insertSql);
-                        //ToDo - handle blob types and strings > 65535b
                     }
                 }
                 else
@@ -81,14 +79,10 @@ namespace Simple.Data.Firebird
         }
 
         
-        private bool CanInsertInExecuteBlock(InsertColumn[] data, string insertSql, int maximumQuerySize)
+        private bool CanInsertInExecuteBlock(InsertColumn[] data, string insertSql, FbBulkInsertQueryBuilder queryBuilder)
         {
-            return
-                data.All(
-                    ic => ic.Value == null || (
-                        ic.Value.GetType() != typeof (byte[]) &&
-                        FbBulkInsertQueryBuilder.SizeOf(insertSql) > maximumQuerySize)
-                    );
+            return queryBuilder.SizeOf(insertSql) <= queryBuilder.MaximumQuerySize &&
+                   data.All(ic => ic.Value == null || !ic.Value.GetType().IsArray);
         }
 
         private IEnumerable<IDictionary<string, object>> CreateAndExecuteInsertCommand(IDbTransaction transaction, string executeBlockSql, bool resultRequired)

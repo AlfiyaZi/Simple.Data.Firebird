@@ -205,19 +205,64 @@ namespace Simple.Data.Firebird.Test
         }
 
         [Fact]
+        public void TestInsertManyWithoutResults()
+        {
+            _db.Persons.Insert(new[]
+            {
+                new {Id = 0, Name = "John", Surname = "Doe", Age = 42},
+                new {Id = 1, Name = "Lois", Surname = "Lane", Age = 22}
+            }).ToList();
+
+            var actual = _db.Persons.FindAllById(new[] {0, 1}).OrderById().ToList();
+
+
+            Assert.Equal("John", actual[0].Name);
+            Assert.Equal("Doe", actual[0].Surname);
+            Assert.Equal(42, actual[0].Age);
+
+            Assert.Equal("Lois", actual[1].Name);
+            Assert.Equal("Lane", actual[1].Surname);
+            Assert.Equal(22, actual[1].Age);
+        }
+
+        [Fact]
         public void TestInsertManyWithNonClrObject()
         {
             var actual = _db.Persons.Insert(new[]
             {
-                new {Name = "John", Surname = "", Age = 42},
-                new {Name = "Lois", Surname = "", Age = 42}
-            });
+                new {Name = "John", Surname = new Surname("Doe"), Age = 42},
+                new {Name = "Lois", Surname = new Surname("Lane"), Age = 22}
+            }).ToList();
 
-            //Assert.Equal("John", actual.Name);
-            //Assert.Equal("Doe", actual.Surname);
-            //Assert.Equal(42, actual.Age);
-            //Assert.Null(actual.MiddleName);
+            Assert.Equal("John", actual[0].Name);
+            Assert.Equal("Doe", actual[0].Surname);
+            Assert.Equal(42, actual[0].Age);
+
+            Assert.Equal("Lois", actual[1].Name);
+            Assert.Equal("Lane", actual[1].Surname);
+            Assert.Equal(22, actual[1].Age);
         }
+
+
+        // Bulk insert is done in execute block do speed up insert process. 
+        // Since it's not possible to use command parameters this way we have to make sure that it's not possible to do sql injection
+        [Fact]
+        public void TestInsertManyWithApostrophe()  
+        {
+            var actual = _db.Persons.Insert(new[]
+            {
+                new {Name = "Na'me", Surname = new Surname("Sur'name"), Age = 0},
+                new {Name = "Name'", Surname = new Surname("Surname'"), Age = 0}
+            }).ToList();
+
+
+            Assert.Equal("Na'me", actual[0].Name);
+            Assert.Equal("Sur'name", actual[0].Surname);
+
+            Assert.Equal("Name'", actual[1].Name);
+            Assert.Equal("Surname'", actual[1].Surname);
+        }
+
 
     public class Surname
     {

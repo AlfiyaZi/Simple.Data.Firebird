@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Simple.Data.Firebird
 {
-    public class FbBulkInsertQueryBuilder
+    class FbBulkInsertQueryBuilder
     {
         public int QueryCount { get { return _queries.Count; } }
         public int MaximumQuerySize { get; private set; }
@@ -22,7 +22,7 @@ namespace Simple.Data.Firebird
         private readonly string _currentTemplate;
         private int _currentSize;
 
-        public FbBulkInsertQueryBuilder(bool shouldReturnResluts, IEnumerable<string> returnParams = null)
+        internal FbBulkInsertQueryBuilder(bool shouldReturnResluts, IEnumerable<string> returnParams = null)
         {
             _returnParams = returnParams;
 
@@ -34,19 +34,19 @@ namespace Simple.Data.Firebird
             //ToDo: based on Firebird version (<=2.5.x or >= 3.0.x) pick proper size for max count / length of execute block
         }
 
-        public bool CanAddQuery(string query)
+        internal bool CanAddQuery(string query)
         {
             return _currentSize + SizeOf(query) <= MaximumExecuteBlockSize && _queries.Count < MaximumExecuteBlockQueries;
         }
 
-        public void AddQuery(string query)
+        internal void AddQuery(string query)
         {
             if (!CanAddQuery(query)) throw new InvalidOperationException("Execute block size or query count exceeded maximum value.");
             _queries.Add(query);
             _currentSize += SizeOf(query);
         }
 
-        public string GetSql()
+        internal string GetSql()
         {
             return String.Format(
                 _currentTemplate, 
@@ -55,7 +55,7 @@ namespace Simple.Data.Firebird
             );
         }
 
-        public static int SizeOf(string str)
+        internal int SizeOf(string str)
         {
             return Encoding.UTF8.GetByteCount(str);
         }

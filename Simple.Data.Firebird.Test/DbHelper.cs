@@ -14,6 +14,7 @@ namespace Simple.Data.Firebird.Test
     public class DbHelper
     {
         private static readonly Lazy<bool> _dbCreated = new Lazy<bool>(CreateDatabaseIfNeeded);
+        public static string DbCreationScript { get; set; }
 
         public dynamic OpenDefault()
         {
@@ -43,7 +44,7 @@ namespace Simple.Data.Firebird.Test
             using (var connection = new FbConnection(GetConnectionString()))
             {
                 var batchExecution = new FbBatchExecution(connection);
-                var script = new FbScript(Resources.create_db);
+                var script = new FbScript(DbCreationScript ?? Resources.create_db);
                 script.Parse();
                 batchExecution.AppendSqlStatements(script);
                 batchExecution.Execute();

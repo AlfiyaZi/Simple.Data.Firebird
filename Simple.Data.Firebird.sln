@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Firebird", "Sim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple.Data.Firebird.Test", "Simple.Data.Firebird.Test\Simple.Data.Firebird.Test.csproj", "{6C4E4A13-606F-49B8-A6EF-A070848912D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkInsertPerformanceTest", "BulkInsertPerformanceTest\BulkInsertPerformanceTest.csproj", "{EA6842AA-4FBD-416B-A28A-8C2F1A718003}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C4E4A13-606F-49B8-A6EF-A070848912D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA6842AA-4FBD-416B-A28A-8C2F1A718003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA6842AA-4FBD-416B-A28A-8C2F1A718003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA6842AA-4FBD-416B-A28A-8C2F1A718003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA6842AA-4FBD-416B-A28A-8C2F1A718003}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

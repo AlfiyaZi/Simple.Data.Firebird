@@ -244,17 +244,44 @@ namespace Simple.Data.Firebird.Test
         }
 
 
-        // Bulk insert is done in execute block do speed up insert process. 
-        // Since it's not possible to use command parameters this way we have to make sure that it's not possible to do sql injection
+        // Bulk insert is done in execute block to speed up insert process. 
+        // Since it's possible to use mode when command parameters are not used we have to make sure that it's not possible to do sql injection
         [Fact]
-        public void TestInsertManyWithApostrophe()  
+        public void TestInsertManyWithApostrophe()
         {
+            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+
             var actual = _db.Persons.Insert(new[]
             {
                 new {Name = "Na'me", Surname = new Surname("Sur'name"), Age = 0},
                 new {Name = "Name'", Surname = new Surname("Surname'"), Age = 0}
             }).ToList();
 
+            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+
+            Assert.Equal("Na'me", actual[0].Name);
+            Assert.Equal("Sur'name", actual[0].Surname);
+
+            Assert.Equal("Name'", actual[1].Name);
+            Assert.Equal("Surname'", actual[1].Surname);
+        }
+
+        // Bulk insert is done in execute block to speed up insert process. 
+        // Since it's possible to use mode when command parameters are not used we have to make sure that it's not possible to do sql injection
+        [Fact]
+        public void TestInsertManyWithoutResultWithApostrophe()
+        {
+            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+
+            _db.Persons.Insert(new[]
+            {
+                new {Id = 2, Name = "Na'me", Surname = new Surname("Sur'name"), Age = 0},
+                new {Id = 3, Name = "Name'", Surname = new Surname("Surname'"), Age = 0}
+            }).ToList();
+
+            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+
+            var actual = _db.Persons.FindAllById(new[] { 2, 3 }).OrderById().ToList();
 
             Assert.Equal("Na'me", actual[0].Name);
             Assert.Equal("Sur'name", actual[0].Surname);

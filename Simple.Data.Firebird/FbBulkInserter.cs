@@ -36,8 +36,11 @@ namespace Simple.Data.Firebird
             var table = adapter.GetSchema().FindTable(tableName);
             var tableColumns = table.Columns.Select(c => (FbColumn)c).ToArray();
 
-            var returnsColumnsSql = tableColumns.Select(c => c.ToSql()).ToList();
+            var returnsColumnsSql = tableColumns.Select(c => c.NameTypeSql).ToList();
             var queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
+            var currentColumns = new List<InsertColumn>();
+
+            int currentId = 0;
 
             foreach (var data in dataList)
             { //add list, add data, clean on execute procedure (or even better, pass to create and execute insert command) and call onError for all if exception occurs
@@ -45,52 +48,54 @@ namespace Simple.Data.Firebird
                 {
                     Name = kv.Key,
                     Value = kv.Value,
-                    Column = (FbColumn) table.FindColumn(kv.Key)
+                    Column = (FbColumn) table.FindColumn(kv.Key),
+                    ParameterName = "p"+(currentId++)
                 }).ToArray();
 
-                string insertSql = GetInsertSql(tableName, tableColumns, insertData, resultRequired);
+                var insertSql = GetInsertSql(tableName, tableColumns, insertData, resultRequired);
 
-                if (CanInsertInExecuteBlock(insertData, insertSql, queryBuilder))
+                if (queryBuilder.CanAddQuery(insertSql))
                 {
-
-                    if (queryBuilder.CanAddQuery(insertSql)) queryBuilder.AddQuery(insertSql);
-                    else
-                    {
-                        var subResult = CreateAndExecuteInsertCommand(transaction, queryBuilder.GetSql(), resultRequired);
-                        if (resultRequired) result.AddRange(subResult);
-                        queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
-                        queryBuilder.AddQuery(insertSql);
-                    }
+                    queryBuilder.AddQuery(insertSql);
+                    currentColumns.AddRange(insertData);
                 }
                 else
                 {
-                    var subResult = _inserter.Value.Insert(adapter, tableName, data, transaction, resultRequired);
-                    if (resultRequired) result.Add(subResult);
+                    var subResult = CreateAndExecuteInsertCommand(transaction, currentColumns, queryBuilder.GetSql(), resultRequired);
+                    if (resultRequired) result.AddRange(subResult);
+                    currentColumns.Clear();
+
+                    queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, returnsColumnsSql);
+                    queryBuilder.AddQuery(insertSql);
+                    currentColumns.AddRange(insertData);
                 }
             }
 
             if (queryBuilder.QueryCount > 0)
             {
-                var subResult = CreateAndExecuteInsertCommand(transaction, queryBuilder.GetSql(), resultRequired);
+                var subResult = CreateAndExecuteInsertCommand(transaction, currentColumns, queryBuilder.GetSql(), resultRequired);
                 if (resultRequired) result.AddRange(subResult);
             }
 
             return result;
         }
 
-        
-        private bool CanInsertInExecuteBlock(InsertColumn[] data, string insertSql, FbBulkInsertQueryBuilder queryBuilder)
-        {
-            return queryBuilder.SizeOf(insertSql) <= queryBuilder.MaximumQuerySize &&
-                   data.All(ic => ic.Value == null || !ic.Value.GetType().IsArray);
-        }
-
-        private IEnumerable<IDictionary<string, object>> CreateAndExecuteInsertCommand(IDbTransaction transaction, string executeBlockSql, bool resultRequired)
+        private IEnumerable<IDictionary<string, object>> CreateAndExecuteInsertCommand(IDbTransaction transaction, List<InsertColumn> currentColumns, string executeBlockSql, bool resultRequired)
         {
             using (var command = transaction.Connection.CreateCommand())
             {
                 command.Transaction = transaction;
                 command.CommandText = executeBlockSql;
+
+                foreach (var insertColumn in currentColumns)
+                {
+                    command.Parameters.Add(new FbParameter
+                    {
+                        ParameterName = "@"+insertColumn.ParameterName,
+                        Value = insertColumn.Value,
+                        Direction = ParameterDirection.Input
+                    });
+                }
 
                 return ExecuteInsertCommand(command, resultRequired);
             }
@@ -112,19 +117,41 @@ namespace Simple.Data.Firebird
             }
         }
 
-        private string GetInsertSql(string tableName, FbColumn[] tableColumns, InsertColumn[] insertData, bool resultRequired)
+        private ExecuteBlockInsertSql GetInsertSql(string tableName, FbColumn[] tableColumns, InsertColumn[] insertData, bool resultRequired)
         {
             string columnsSql = String.Join(",", insertData.Select(s => s.Column.QuotedName));
-            string valuesSql = String.Join(",", insertData.Select(c => c.ValueToSql()));
+            string valuesSql = String.Join(",", insertData.Select(c => ":" + c.ParameterName));
+            string parametersSql = String.Join(",", insertData.Select(c => String.Format("{0} {1}=@{0}", c.ParameterName, c.Column.TypeSql)));
+            int parametersSize = insertData.Sum(id => id.Column.Size);
+            string insertSql;
 
             if (resultRequired)
             {
                 string returnsColumnSql = String.Join(",", tableColumns.Select(c => c.QuotedName));
                 string returnsVariablesSql = String.Join(",", tableColumns.Select(c => ":" + c.QuotedName));
-                return string.Format("INSERT INTO {0} ({1}) VALUES({2}) RETURNING {3} into {4};suspend;",
-                tableName, columnsSql, valuesSql, returnsColumnSql, returnsVariablesSql);
+
+                insertSql = String.Format("INSERT INTO {0} ({1}) VALUES({2}) RETURNING {3} into {4};suspend;",
+                    tableName, columnsSql, valuesSql, returnsColumnSql, returnsVariablesSql);                
             }
-            else return string.Format("INSERT INTO {0} ({1}) VALUES({2});", tableName, columnsSql, valuesSql);
+            else
+            {
+                insertSql = String.Format("INSERT INTO {0} ({1}) VALUES({2});", tableName, columnsSql, valuesSql);
+            }
+            return new ExecuteBlockInsertSql(parametersSql, insertSql, parametersSize);
+        }
+    }
+
+    internal struct ExecuteBlockInsertSql
+    {
+        internal readonly string ParametersSql;
+        internal readonly string InsertSql;
+        internal readonly int ParametersSize;
+
+        public ExecuteBlockInsertSql(string parametersSql, string insertSql, int parametersSize)
+        {
+            ParametersSql = parametersSql;
+            InsertSql = insertSql;
+            ParametersSize = parametersSize;
         }
     }
 }

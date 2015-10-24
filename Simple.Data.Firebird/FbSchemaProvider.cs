@@ -45,6 +45,7 @@ namespace Simple.Data.Firebird
                 false,
                 Int32.Parse(columnRow["field_length"].ToString()),
                 Int32.Parse(columnRow["field_precision"].ToString()),
+                Int32.Parse(columnRow["field_size"].ToString()),
                 TypeMap.GetTypeEntry(columnRow["field_type"].ToString(), columnRow["field_subtype"].ToString())
                 )
             );

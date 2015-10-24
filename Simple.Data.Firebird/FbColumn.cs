@@ -8,9 +8,10 @@ using Simple.Data.Ado.Schema;
 
 namespace Simple.Data.Firebird
 {
-    public class FbColumn : Column
+    class FbColumn : Column
     {
         private readonly int _precision;
+        internal int Size { get; private set; }
         public TypeEntry Type { get; private set; }
 
         public FbColumn(string actualName, Table table) : base(actualName, table)
@@ -29,16 +30,22 @@ namespace Simple.Data.Firebird
         {
         }
 
-        public FbColumn(string actualName, Table table, bool isIdentity, int maxLength, int precision, TypeEntry type)
+        public FbColumn(string actualName, Table table, bool isIdentity, int maxLength, int precision, int size, TypeEntry type)
             : base(actualName, table, isIdentity, type.DbType, maxLength)
         {
             _precision = precision;
             Type = type;
+            Size = size;
         }
 
-        public string ToSql()
+        public string TypeSql
         {
-            return QuotedName + " " + Type.FbTypeName + LengthPrecisionSql();
+            get { return Type.FbTypeName + LengthPrecisionSql(); }
+        }
+
+        public string NameTypeSql
+        {
+            get { return QuotedName + " " + Type.FbTypeName + LengthPrecisionSql(); }
         }
 
         private string LengthPrecisionSql()

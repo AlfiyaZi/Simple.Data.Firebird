@@ -7,50 +7,54 @@ namespace Simple.Data.Firebird
 {
     class FbBulkInsertQueryBuilder
     {
-        public int QueryCount { get { return _queries.Count; } }
-        public int MaximumQuerySize { get; private set; }
+        internal int QueryCount { get { return _insertSqls.Count; } }
 
-        private const int MaximumExecuteBlockQueries = 255;
+        public const int MaximumExecuteBlockQueries = 255;
         private const int MaximumExecuteBlockSize = 65535;
+        private const int MaximumExecuteBlockInputParametersSize = 65535;
 
-        private readonly string _executeBlockTemplate = "execute block as begin {0} end";
-        private readonly string _executeBlockWithReturnsTemplate = "execute block returns ({1}) as begin {0} end";
+        private readonly string _executeBlockTemplate = "execute block ({0}) as begin {1} end";
+        private readonly string _executeBlockWithReturnsTemplate = "execute block ({0}) returns ({2}) as begin {1} end";
 
         private readonly IEnumerable<string> _returnParams;
-        private readonly List<string> _queries = new List<string>();
+        private readonly List<string> _insertSqls = new List<string>();
+        private readonly List<string> _parametersSqls = new List<string>();
 
         private readonly string _currentTemplate;
-        private int _currentSize;
+        private int _currentBodySize;
+        private int _currentInputParametersSize;
 
         internal FbBulkInsertQueryBuilder(bool shouldReturnResluts, IEnumerable<string> returnParams = null)
         {
             _returnParams = returnParams;
 
             _currentTemplate = shouldReturnResluts ? _executeBlockWithReturnsTemplate : _executeBlockTemplate;
-            _currentSize = SizeOf(GetSql());
-
-            MaximumQuerySize = MaximumExecuteBlockSize - _currentSize;
+            _currentBodySize = SizeOf(GetSql());
 
             //ToDo: based on Firebird version (<=2.5.x or >= 3.0.x) pick proper size for max count / length of execute block
         }
 
-        internal bool CanAddQuery(string query)
+        internal bool CanAddQuery(ExecuteBlockInsertSql query)
         {
-            return _currentSize + SizeOf(query) <= MaximumExecuteBlockSize && _queries.Count < MaximumExecuteBlockQueries;
+            return _currentBodySize + SizeOf(query.InsertSql) + SizeOf(query.ParametersSql) <= MaximumExecuteBlockSize &&
+                   _currentInputParametersSize + query.ParametersSize <= MaximumExecuteBlockInputParametersSize &&
+                   _insertSqls.Count < MaximumExecuteBlockQueries;
         }
 
-        internal void AddQuery(string query)
+        internal void AddQuery(ExecuteBlockInsertSql query)
         {
-            if (!CanAddQuery(query)) throw new InvalidOperationException("Execute block size or query count exceeded maximum value.");
-            _queries.Add(query);
-            _currentSize += SizeOf(query);
+            _insertSqls.Add(query.InsertSql);
+            _parametersSqls.Add(query.ParametersSql);
+            _currentBodySize += (SizeOf(query.ParametersSql) + SizeOf(query.InsertSql));
+            _currentInputParametersSize += query.ParametersSize;
         }
 
         internal string GetSql()
         {
             return String.Format(
-                _currentTemplate, 
-                String.Concat(_queries), 
+                _currentTemplate,
+                String.Join(",", _parametersSqls),
+                String.Concat(_insertSqls), 
                 _returnParams != null ? String.Join(",", _returnParams) : ""
             );
         }

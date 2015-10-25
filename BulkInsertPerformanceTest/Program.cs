@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BulkInsertPerformanceTest.Properties;
 using Simple.Data;
 using Simple.Data.Firebird;
+using Simple.Data.Firebird.BulkInsert;
 using Simple.Data.Firebird.Test;
 
 namespace BulkInsertPerformanceTest
@@ -17,16 +18,14 @@ namespace BulkInsertPerformanceTest
         static void Main(string[] args)
         {
             DbHelper.DbCreationScript = Resources.create_db;
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
 
             var db = new DbHelper().OpenDefault();
 
-            int objectCount = 1000000;
-
             var s = Stopwatch.StartNew();
 
-            db.Test_Table.Insert(TestObjects(objectCount));
-            //db.Test_Table2.Insert(TestObjects2(objectCount));
+            db.Test_Table.Insert(TestObjects(100000));
+            db.Test_Table2.Insert(TestObjects2(10000));
             s.Stop();
             Console.WriteLine(s.Elapsed);
             //Console.ReadKey();

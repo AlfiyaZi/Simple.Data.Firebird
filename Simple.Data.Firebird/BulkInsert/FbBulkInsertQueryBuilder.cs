@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace Simple.Data.Firebird
+namespace Simple.Data.Firebird.BulkInsert
 {
     class FbBulkInsertQueryBuilder
     {
@@ -18,7 +17,7 @@ namespace Simple.Data.Firebird
         private readonly string _executeBlockTemplate = "execute block {0}as begin {1} end";
         private readonly string _executeBlockWithReturnsTemplate = "execute block {0}returns ({2}) as begin {1} end";
 
-        private readonly IEnumerable<string> _returnParams;
+        private readonly string _returnParamsSql;
         private readonly List<string> _insertSqls = new List<string>();
         private readonly List<string> _parametersSqls = new List<string>();
 
@@ -26,9 +25,9 @@ namespace Simple.Data.Firebird
         private int _currentBodySize;
         private int _currentInputParametersSize;
 
-        internal FbBulkInsertQueryBuilder(bool shouldReturnResluts, IEnumerable<string> returnParams = null)
+        internal FbBulkInsertQueryBuilder(bool shouldReturnResluts, string returnParamsSql)
         {
-            _returnParams = returnParams;
+            _returnParamsSql = returnParamsSql;
 
             _currentTemplate = shouldReturnResluts ? _executeBlockWithReturnsTemplate : _executeBlockTemplate;
             _currentBodySize = SizeOf(GetSql());
@@ -59,7 +58,7 @@ namespace Simple.Data.Firebird
                 _currentTemplate,
                 _parametersSqls.Count > 0 ? String.Format("({0}) ", String.Join(",", _parametersSqls)) : "",
                 String.Concat(_insertSqls), 
-                _returnParams != null ? String.Join(",", _returnParams) : ""
+                _returnParamsSql != null ? String.Join(",", _returnParamsSql) : ""
             );
         }
 

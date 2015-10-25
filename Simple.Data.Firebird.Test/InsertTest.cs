@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
+using Simple.Data.Firebird.BulkInsert;
 using Xunit;
 
 namespace Simple.Data.Firebird.Test

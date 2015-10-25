@@ -15,6 +15,8 @@ namespace Simple.Data.Firebird
     [Export(typeof(IBulkInserter))]
     public class FbBulkInserter : IBulkInserter
     {
+        const int ParameterSizeInBytes = 4;
+
         public IEnumerable<IDictionary<string, object>> Insert(AdoAdapter adapter, string tableName, IEnumerable<IDictionary<string, object>> dataList, IDbTransaction transaction, Func<IDictionary<string, object>, Exception, bool> onError,
             bool resultRequired)
         {
@@ -158,7 +160,7 @@ namespace Simple.Data.Firebird
             string columnsSql = String.Join(",", insertData.Select(s => s.Column.QuotedName));
             string valuesSql = String.Join(",", insertData.Select(c => ":" + c.ParameterName));
             string parametersSql = String.Join(",", insertData.Select(c => String.Format("{0} {1}=@{0}", c.ParameterName, c.Column.TypeSql)));
-            int parametersSize = insertData.Sum(id => id.Column.Size);
+            int parametersSize = insertData.Sum(id => id.Column.Size) + insertData.Length * ParameterSizeInBytes;
             string insertSql;
 
             if (resultRequired)

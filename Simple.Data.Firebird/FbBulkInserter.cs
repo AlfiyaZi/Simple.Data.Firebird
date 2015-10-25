@@ -37,7 +37,7 @@ namespace Simple.Data.Firebird
             var tableColumns = table.Columns.Select(c => (FbColumn)c).ToArray();
             var returnTableColumns = tableColumns.Select(c => c.NameTypeSql).ToList();
 
-            var availableColumnNames = new HashSet<string>(tableColumns.Select(tc => tc.HomogenizedName));
+            var nameToFbColumns = tableColumns.ToDictionary(c => c.HomogenizedName, c => c);
 
             var insertContext = new InsertSqlContext
             {
@@ -54,10 +54,10 @@ namespace Simple.Data.Firebird
 
             foreach (var data in dataList)
             { //add list, add data, clean on execute procedure (or even better, pass to create and execute insert command) and call onError for all if exception occurs
-                var insertData = data.Where(p => availableColumnNames.Contains(p.Key.Homogenize())).Select(kv => new InsertColumn
+                var insertData = data.Where(p => nameToFbColumns.ContainsKey(p.Key.Homogenize())).Select(kv => new InsertColumn
                 {
                     Value = kv.Value,
-                    Column = (FbColumn) table.FindColumn(kv.Key),
+                    Column =  nameToFbColumns[kv.Key.Homogenize()],
                     ParameterName = "p"+GetCurrentParameterId(ref currentId,maxId)
                 }).ToArray();
 
@@ -157,6 +157,8 @@ namespace Simple.Data.Firebird
 
         private ExecuteBlockInsertSql GetInsertSql(InsertSqlContext context, InsertColumn[] insertData, bool resultRequired)
         {
+            // ToDo: join both get insert sql methods, even in unsafe method in single insert add array / blob with parameters as parametrized values, and everything else as plain text
+
             string columnsSql = String.Join(",", insertData.Select(s => s.Column.QuotedName));
             string valuesSql = String.Join(",", insertData.Select(c => ":" + c.ParameterName));
             string parametersSql = String.Join(",", insertData.Select(c => String.Format("{0} {1}=@{0}", c.ParameterName, c.Column.TypeSql)));

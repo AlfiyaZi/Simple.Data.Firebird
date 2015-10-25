@@ -55,7 +55,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="TestObject.cs" />
+    <Compile Include="TestObjects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

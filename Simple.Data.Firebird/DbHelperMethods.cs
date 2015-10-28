@@ -7,7 +7,7 @@ using Simple.Data.Ado;
 
 namespace Simple.Data.Firebird
 {
-    internal static class DbHelpers
+    internal static class DbHelperMethods
     {
         public static void InTransaction(this AdoAdapter adapter, Action<IDbTransaction> action)
         {

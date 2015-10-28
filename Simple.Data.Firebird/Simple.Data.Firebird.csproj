@@ -31,9 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=4.7.0.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
+    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=4.8.1.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.4.7.0.0\lib\net40-client\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.4.8.1.1\lib\net40-client\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
     <Reference Include="Simple.Data, Version=0.19.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BulkInsert\FbInsertSqlContext.cs" />
-    <Compile Include="DbHelpers.cs" />
+    <Compile Include="DbHelperMethods.cs" />
     <Compile Include="BulkInsert\FbBulkInserter.cs" />
     <Compile Include="BulkInsert\FbBulkInsertQueryBuilder.cs" />
     <Compile Include="BulkInsert\FbBulkInsertSqlProvider.cs" />

@@ -30,7 +30,7 @@ namespace Simple.Data.Firebird.BulkInsert
             _returnParamsSql = returnParamsSql;
 
             _currentTemplate = shouldReturnResluts ? _executeBlockWithReturnsTemplate : _executeBlockTemplate;
-            _currentBodySize = SizeOf(GetSql());
+            _currentBodySize = GetSql().GetSize();
 
             MaximumQuerySize = MaximumExecuteBlockSize - _currentBodySize;
 
@@ -64,14 +64,9 @@ namespace Simple.Data.Firebird.BulkInsert
 
         private int SizeOf(ExecuteBlockInsertSql query)
         {
-            return SizeOf(query.InsertSql) 
-                + SizeOf(query.ParametersSql) 
+            return query.InsertSql.GetSize() 
+                + query.ParametersSql.GetSize() 
                 + (!String.IsNullOrEmpty(query.ParametersSql) && _parametersSqls.Count > 0 ? SizeOfParametersSeparator : 0);
-        }
-
-        internal int SizeOf(string str)
-        {
-            return Encoding.UTF8.GetByteCount(str);
         }
     }
 }

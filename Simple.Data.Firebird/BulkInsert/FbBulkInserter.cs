@@ -93,7 +93,7 @@ namespace Simple.Data.Firebird.BulkInsert
 
         private bool CanInsertInExecuteBlock(string insertSql, FbBulkInsertQueryBuilder queryBuilder)
         {
-            return queryBuilder.SizeOf(insertSql) <= queryBuilder.MaximumQuerySize;
+            return insertSql.GetSize() <= queryBuilder.MaximumQuerySize;
         }
 
         private IEnumerable<IDictionary<string, object>> CreateAndExecuteInsertCommand(IDbTransaction transaction, List<InsertColumn> currentColumns, string executeBlockSql, bool resultRequired)

@@ -35,7 +35,7 @@ namespace Simple.Data.Firebird.BulkInsert
 
                     valuesList.Add(":" + currentValue.ParameterName);
                     parametersList.Add(String.Format("{0} {1}=@{0}", currentValue.ParameterName,
-                        currentValue.Column.TypeSql));
+                        currentValue.ValueParameterToSql()));
                     parametersSize += currentValue.Column.Size + ParameterSizeInBytes;
                 }
             }

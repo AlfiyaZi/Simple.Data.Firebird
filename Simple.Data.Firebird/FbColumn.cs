@@ -38,12 +38,12 @@ namespace Simple.Data.Firebird
             Size = size;
         }
 
-        public string TypeSql
+        internal string TypeSql
         {
             get { return Type.FbTypeName + LengthPrecisionSql(); }
         }
 
-        public string NameTypeSql
+        internal string NameTypeSql
         {
             get { return QuotedName + " " + Type.FbTypeName + LengthPrecisionSql(); }
         }

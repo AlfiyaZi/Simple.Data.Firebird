@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using FirebirdSql.Data.FirebirdClient;
 using Simple.Data.Ado.Schema;
+using Simple.Data.Firebird.BulkInsert;
 
 namespace Simple.Data.Firebird
 {
@@ -67,6 +69,19 @@ namespace Simple.Data.Firebird
                 Column.DbType == DbType.Date
                     ? dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
                     : dateTime.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
+        }
+
+        public string ValueParameterToSql()
+        {
+            if (Column.Type.FbDbType == FbDbType.VarChar || Column.Type.FbDbType == FbDbType.VarChar)
+                return Column.Type.FbTypeName + String.Format("({0})", SmallestTextParameterSize());
+            else
+                return Column.TypeSql;
+        }
+
+        private int SmallestTextParameterSize()
+        {
+            return Value == null ? 1 : Math.Min(Column.Size,Value.ToString().GetSize());
         }
     }   
 }

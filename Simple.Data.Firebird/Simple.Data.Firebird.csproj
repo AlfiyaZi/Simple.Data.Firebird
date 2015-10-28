@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BulkInsert\FbInsertSqlContext.cs" />
+    <Compile Include="BulkInsert\StringHelpers.cs" />
     <Compile Include="DbHelperMethods.cs" />
     <Compile Include="BulkInsert\FbBulkInserter.cs" />
     <Compile Include="BulkInsert\FbBulkInsertQueryBuilder.cs" />

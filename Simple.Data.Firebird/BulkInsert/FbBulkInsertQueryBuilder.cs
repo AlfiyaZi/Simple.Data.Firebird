@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Simple.Data.Firebird.BulkInsert
+namespace Simple.Data.Firebird
 {
     class FbBulkInsertQueryBuilder
     {

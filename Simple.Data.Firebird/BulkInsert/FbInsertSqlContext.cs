@@ -1,4 +1,4 @@
-namespace Simple.Data.Firebird.BulkInsert
+namespace Simple.Data.Firebird
 {
     internal class FbInsertSqlContext
     {

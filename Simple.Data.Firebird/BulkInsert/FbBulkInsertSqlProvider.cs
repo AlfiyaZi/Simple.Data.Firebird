@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Simple.Data.Firebird.BulkInsert
+namespace Simple.Data.Firebird
 {
     public class FbBulkInsertSqlProvider
     {

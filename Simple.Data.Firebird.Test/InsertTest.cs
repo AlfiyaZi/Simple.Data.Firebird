@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
-using Simple.Data.Firebird.BulkInsert;
 using Xunit;
 
 namespace Simple.Data.Firebird.Test
@@ -250,7 +249,7 @@ namespace Simple.Data.Firebird.Test
         [Fact]
         public void TestInsertManyWithApostrophe()
         {
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = true;
 
             var actual = _db.Persons.Insert(new[]
             {
@@ -258,7 +257,7 @@ namespace Simple.Data.Firebird.Test
                 new {Name = "Name'", Surname = new Surname("Surname'"), Age = 0}
             }).ToList();
 
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = false;
 
             Assert.Equal("Na'me", actual[0].Name);
             Assert.Equal("Sur'name", actual[0].Surname);
@@ -272,7 +271,7 @@ namespace Simple.Data.Firebird.Test
         [Fact]
         public void TestInsertManyWithoutResultWithApostrophe()
         {
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = true;
 
             _db.Persons.Insert(new[]
             {
@@ -280,7 +279,7 @@ namespace Simple.Data.Firebird.Test
                 new {Id = 3, Name = "Name'", Surname = new Surname("Surname'"), Age = 0}
             }).ToList();
 
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = false;
 
             var actual = _db.Persons.FindAllById(new[] { 2, 3 }).OrderById().ToList();
 

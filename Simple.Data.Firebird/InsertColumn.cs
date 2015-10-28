@@ -4,7 +4,6 @@ using System.Data;
 using System.Globalization;
 using FirebirdSql.Data.FirebirdClient;
 using Simple.Data.Ado.Schema;
-using Simple.Data.Firebird.BulkInsert;
 
 namespace Simple.Data.Firebird
 {

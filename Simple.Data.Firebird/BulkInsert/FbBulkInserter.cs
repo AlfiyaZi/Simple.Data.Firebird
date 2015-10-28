@@ -7,7 +7,7 @@ using FirebirdSql.Data.FirebirdClient;
 using Simple.Data.Ado;
 using Simple.Data.Extensions;
 
-namespace Simple.Data.Firebird.BulkInsert
+namespace Simple.Data.Firebird
 {
     [Export(typeof(IBulkInserter))]
     public class FbBulkInserter : IBulkInserter
@@ -87,7 +87,7 @@ namespace Simple.Data.Firebird.BulkInsert
                 ReturnsVariablesSql = String.Join(",", tableColumns.Select(c => ":" + c.QuotedName)),
                 MaxParameterId = tableColumns.Length * FbBulkInsertQueryBuilder.MaximumExecuteBlockQueries,
                 LastParameterId = -1,
-                SkipCommandParameters = BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod
+                SkipCommandParameters = BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod
             };
         }
 
@@ -134,7 +134,7 @@ namespace Simple.Data.Firebird.BulkInsert
         }
     }
 
-    public static class BulkInserterConfiguration
+    public static class BulkInsertConfiguration
     {
         /// <summary>
         /// Configures Firebird provider to place column values for insert directly in sql string instead of using command parameters.

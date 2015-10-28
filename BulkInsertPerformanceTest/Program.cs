@@ -10,7 +10,6 @@ using BulkInsertPerformanceTest.Properties;
 using FirebirdSql.Data.FirebirdClient;
 using Simple.Data;
 using Simple.Data.Firebird;
-using Simple.Data.Firebird.BulkInsert;
 using Simple.Data.Firebird.Test;
 
 namespace BulkInsertPerformanceTest
@@ -61,10 +60,10 @@ namespace BulkInsertPerformanceTest
         [Benchmark]
         public void UnsafeBulkInsert()
         {
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = true;
             db.Test_Table.Insert(TestObjects(testObjectCount));
             db.Test_Table2.Insert(TestObjects2(testObject2Count));
-            BulkInserterConfiguration.UseFasterUnsafeBulkInsertMethod = false;
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = false;
         }
 
         [Benchmark]

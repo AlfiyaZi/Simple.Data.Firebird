@@ -56,9 +56,9 @@ namespace Simple.Data.Firebird.Test
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "testdatabase.fdb");
         }
 
-        private static string GetConnectionString()
+        public static string GetConnectionString()
         {
-            return String.Format(ConfigurationManager.AppSettings["connectionStringTemplate"], GetDatabaseFilePath());
+            return String.Format(ConfigurationManager.AppSettings["connectionStringTemplate"] ?? "User=SYSDBA;Password=masterkey;Database={0};DataSource=localhost; Port=3050;Dialect=3;Charset=UTF8;Connection lifetime=15;Pooling=true; MinPoolSize=0;MaxPoolSize=50;Packet Size=8192;ServerType=0;", GetDatabaseFilePath());
         }
     }
 }

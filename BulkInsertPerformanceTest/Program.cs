@@ -21,6 +21,15 @@ namespace BulkInsertPerformanceTest
             RunBenchmark();
         }
 
+        private static void RunNumericBulkInsert()
+        {
+            new InsertBenchmarks().NumericBulkInsert();
+        }
+        private static void RunStandardBulkInsert()
+        {
+            new InsertBenchmarks().StandardBulkInsert();
+        }
+
         private static void RunLoopInsertWithCommonTransaction()
         {
             new InsertBenchmarks().LoopInsertWithCommonTransaction();
@@ -41,8 +50,10 @@ namespace BulkInsertPerformanceTest
     public class InsertBenchmarks
     {
         private dynamic db;
-        private int testObjectCount = 1000;
-        private int testObject2Count = 100;
+        private int testObjectCount = 1000000;
+        private int testObject2Count = 100000;
+        private int testObject3Count = 100000;
+
 
         public InsertBenchmarks()
         {
@@ -66,7 +77,7 @@ namespace BulkInsertPerformanceTest
             BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = false;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void LoopInsert()
         {
             foreach (var testObject in TestObjects(testObjectCount))
@@ -79,7 +90,7 @@ namespace BulkInsertPerformanceTest
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         public void LoopInsertWithCommonTransaction()
         {
             using (var tx = db.BeginTransaction())
@@ -95,6 +106,20 @@ namespace BulkInsertPerformanceTest
 
                 tx.Commit();
             }
+        }
+
+        [Benchmark]
+        internal void NumericBulkInsert()
+        {
+            db.Test_Table3.Insert(TestObjects3(testObject3Count));
+        }
+
+        [Benchmark]
+        internal void UnsafeNumericBulkInsert()
+        {
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = true;
+            db.Test_Table3.Insert(TestObjects3(testObject3Count));
+            BulkInsertConfiguration.UseFasterUnsafeBulkInsertMethod = false;
         }
 
         static IEnumerable<TestObject> TestObjects(int count)
@@ -150,6 +175,29 @@ namespace BulkInsertPerformanceTest
                 Field28 = testText,
                 Field29 = testText,
                 Field30 = testText
+            };
+
+            for (int i = 0; i < count; i++)
+            {
+                yield return testObject;
+            }
+        }
+
+
+        static IEnumerable<TestObject3> TestObjects3(int count)
+        {
+            var testObject = new TestObject3
+            {
+                Field1 = 1 << 0,
+                Field2 = 1 << 2,
+                Field3 = 1 << 4,
+                Field4 = 1 << 6,
+                Field5 = 1 << 8,
+                Field6 = 1 << 10,
+                Field7 = 1 << 12,
+                Field8 = 1 << 14,
+                Field9 = 1 << 16,
+                Field10 = 1 << 18
             };
 
             for (int i = 0; i < count; i++)

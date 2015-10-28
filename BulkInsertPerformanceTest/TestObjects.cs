@@ -46,4 +46,19 @@ namespace BulkInsertPerformanceTest
         public string Field29 { get; set; }
         public string Field30 { get; set; }         
     }
+
+
+    class TestObject3
+    {
+        public int Field1 { get; set; }
+        public int Field2 { get; set; }
+        public int Field3 { get; set; }
+        public int Field4 { get; set; }
+        public int Field5 { get; set; }
+        public int Field6 { get; set; }
+        public int Field7 { get; set; }
+        public int Field8 { get; set; }
+        public int Field9 { get; set; }
+        public int Field10 { get; set; }
+    }
 }

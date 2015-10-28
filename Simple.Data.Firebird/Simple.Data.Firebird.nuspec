@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <title>Simple.Data.Firebird</title>
     <authors>$author$</authors>
     <owners>Rafał Sawicki</owners>

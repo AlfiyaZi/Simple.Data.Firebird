@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using Simple.Data.Ado;
+using Simple.Data.Ado.Schema;
 using Simple.Data.Extensions;
 
 namespace Simple.Data.Firebird
@@ -26,11 +27,13 @@ namespace Simple.Data.Firebird
                 });
                 return result;
             }
-            
-            var tableColumns = adapter.GetSchema().FindTable(tableName).Columns.Select(c => (FbColumn)c).ToArray();
+
+
+            var table = adapter.GetSchema().FindTable(tableName);
+            var tableColumns = table.Columns.Select(c => (FbColumn)c).ToArray();
             var nameToFbColumns = tableColumns.ToDictionary(c => c.HomogenizedName, c => c);
 
-            var insertContext = CreateInsertSqlContext(tableName, tableColumns);
+            var insertContext = CreateInsertSqlContext(table.QualifiedName, tableColumns);
 
             var queryBuilder = new FbBulkInsertQueryBuilder(resultRequired, insertContext.ReturnsExecuteBlockSql);
             var insertSqlProvider = new FbBulkInsertSqlProvider();
